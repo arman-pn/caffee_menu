@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>کافه قهوه</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Markazi+Text:wght@500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap">
+<style>
+/*
+ * توکن‌های طراحی. طرح: «آرت‌دکوی شبانه» — مشکی گرم، خط‌های نازک طلایی و قوس‌های متحدالمرکز.
+ * سایت عمداً فقط یک تم تیره دارد؛ برای تغییر رنگ‌ها همین فایل کافی است.
+ */
+:root {
+  color-scheme: dark;
+
+  /* زمینه‌ها، از تیره به روشن */
+  --bg: #0a0907;
+  --surface: #12100c;
+  --raised: #1a1711;
+  --line: #2e281c;
+
+  /* متن */
+  --ink: #efe6d2;
+  --muted: #a59b84;
+
+  /* طلا */
+  --gold: #d4af6a;
+  --gold-hi: #f6e3a8;
+  --gold-lo: #9a7634;
+  --gold-soft: rgb(212 175 106 / .12);
+  --gold-foil: linear-gradient(120deg, #9a7634 0%, #f6e3a8 28%, #d4af6a 52%, #9a7634 78%, #f0d590 100%);
+  --on-gold: #140f05;
+
+  /* رنگ‌های وضعیت؛ جدا از طلا تا «هشدار» با «تزئین» اشتباه نشود */
+  --ok: #6fcf97;
+  --warn: #f0b44c;
+  --bad: #f0786a;
+  --info: #7fb8e6;
+  --ok-soft: rgb(111 207 151 / .13);
+  --warn-soft: rgb(240 180 76 / .14);
+  --bad-soft: rgb(240 120 106 / .14);
+  --info-soft: rgb(127 184 230 / .14);
+
+  /* فیش کاغذی همیشه روشن است */
+  --paper: #fffef9;
+  --paper-ink: #1c1c1a;
+  --scrim: rgb(0 0 0 / .72);
+
+  /* تایپ */
+  --f-display: 'Markazi Text', 'Vazirmatn', Tahoma, serif;
+  --f-body: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif;
+  --f-latin: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
+
+  --radius: 4px;
+  --shadow: 0 2px 4px rgb(0 0 0 / .4), 0 18px 48px rgb(0 0 0 / .55);
+  --glow: 0 0 0 1px rgb(212 175 106 / .35), 0 10px 40px rgb(212 175 106 / .14);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --header-height: 68px;
+}
+
+/* پایه: تایپوگرافی، دکمه‌ها، فرم‌ها، برچسب‌ها و لایه‌های روی صفحه (کشو، پنجره، پیام). */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 520px at 80% -10%, rgb(212 175 106 / .09), transparent 70%),
+    repeating-linear-gradient(135deg, rgb(212 175 106 / .022) 0 1px, transparent 1px 14px),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.8;
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p { margin: 0; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; line-height: 1.15; text-wrap: balance; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+small { font-size: .78em; font-weight: 400; opacity: .75; }
+:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+::selection { background: var(--gold); color: var(--on-gold); }
+
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.wrap { max-width: 1180px; margin-inline: auto; padding-inline: 20px; }
+.latin { font-family: var(--f-latin); letter-spacing: .26em; text-transform: uppercase; font-size: .68rem; direction: ltr; unicode-bidi: isolate; }
+.eyebrow { color: var(--gold); display: block; margin-bottom: 8px; }
+.gold-text { background: var(--gold-foil); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* خط تزئینی با لوزی وسط؛ امضای بصری سایت */
+.deco { display: flex; align-items: center; gap: 12px; color: var(--gold); margin-block: 10px 0; max-width: 260px; }
+.deco::before, .deco::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.deco::after { background: linear-gradient(270deg, transparent, var(--gold)); }
+.deco i { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); flex: none; }
+
+/* ---------- دکمه‌ها ---------- */
+.btn {
+  position: relative; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid var(--line); background: var(--raised); color: var(--ink);
+  padding: 8px 18px; border-radius: var(--radius); font-weight: 500; text-decoration: none; white-space: nowrap;
+  transition: border-color .2s, color .2s, transform .2s var(--ease), box-shadow .2s;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold-hi); }
+.btn:active { transform: translateY(1px) scale(.985); }
+.btn.primary { background: var(--gold-foil); background-size: 200% 100%; color: var(--on-gold); border-color: transparent; font-weight: 600; }
+.btn.primary:hover { color: var(--on-gold); box-shadow: var(--glow); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--bad); border-color: rgb(240 120 106 / .5); background: transparent; }
+.btn.sm { padding: 4px 12px; font-size: .85rem; }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+.btn[data-armed] { background: var(--bad); color: var(--on-gold); border-color: var(--bad); }
+.btn[aria-busy="true"] { opacity: .65; pointer-events: none; }
+
+/* ---------- فرم‌ها ---------- */
+.form { display: flex; flex-direction: column; gap: 12px; }
+.frow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field > span { font-size: .82rem; color: var(--muted); }
+.field input, .field select, .field textarea, .inp {
+  width: 100%; min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 8px 12px; transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus, .inp:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); outline: none; }
+.field textarea { resize: vertical; min-height: 64px; }
+.check { display: flex; gap: 8px; align-items: center; }
+.check input { accent-color: var(--gold); width: 16px; height: 16px; }
+.ferr { color: var(--bad); font-size: .88rem; font-weight: 500; margin: 0; }
+.ferr:empty { display: none; }
+[aria-invalid="true"] { border-color: var(--bad) !important; box-shadow: 0 0 0 3px var(--bad-soft) !important; }
+
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--bg); }
+.seg button { border: 0; background: transparent; padding: 7px 16px; transition: background .2s, color .2s; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); font-weight: 600; }
+
+.step { display: inline-flex; align-items: center; border: 1px solid var(--gold-lo); border-radius: var(--radius); background: var(--bg); }
+.step button { border: 0; background: transparent; width: 32px; height: 32px; font-size: 1.1rem; line-height: 1; color: var(--gold); }
+.step button:hover { color: var(--gold-hi); }
+.step b { min-width: 26px; text-align: center; font-weight: 600; }
+
+/* ---------- برچسب‌ها و حالت خالی ---------- */
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 1px 10px; border-radius: 99px; font-size: .78rem; font-weight: 500; white-space: nowrap; background: var(--gold-soft); color: var(--gold-hi); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.info { background: var(--info-soft); color: var(--info); }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius); }
+.note-box { background: var(--gold-soft); border: 1px solid rgb(212 175 106 / .25); border-radius: var(--radius); padding: 8px 14px; font-size: .85rem; }
+
+/* ---------- تصویر آیتم ---------- */
+.pic { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: var(--raised); }
+.pic svg, .pic img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* عکس واقعی روی تصویرسازی می‌نشیند */
+.pic img { position: absolute; inset: 0; }
+.thumb { width: 52px; flex: none; border-radius: 3px; border: 1px solid var(--line); }
+
+/* ---------- کشو، پنجره و پیام ---------- */
+.scrim { position: fixed; inset: 0; background: var(--scrim); backdrop-filter: blur(3px); z-index: 40; display: flex; }
+.scrim.center { align-items: center; justify-content: center; padding: 16px; }
+.drawer {
+  margin-inline-start: auto; width: min(430px, 100%); height: 100%; display: flex; flex-direction: column;
+  background: var(--surface); border-inline-start: 1px solid var(--gold-lo); box-shadow: var(--shadow);
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.drawer header, .modal header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.drawer header h3, .modal header h3 { font-size: 1.6rem; color: var(--gold-hi); }
+.drawer .scroll { flex: 1; overflow: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+.modal { background: var(--surface); border: 1px solid var(--gold-lo); border-radius: var(--radius); width: min(560px, 100%); max-height: 100%; overflow: auto; box-shadow: var(--shadow); }
+.modal.wide { width: min(720px, 100%); }
+.modal .mbody { padding: 18px; }
+.x { border: 0; background: none; font-size: 1.5rem; line-height: 1; padding: 2px 8px; color: var(--muted); }
+.x:hover { color: var(--gold-hi); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions.center { justify-content: center; margin-top: 16px; }
+
+.line { display: flex; gap: 10px; align-items: center; }
+.line .t { flex: 1; min-width: 0; }
+.line .t b { display: block; font-weight: 600; line-height: 1.4; }
+.sums { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-size: .92rem; }
+.sums .tot { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 4px; color: var(--gold-hi); }
+
+#toast { position: fixed; inset-block-end: calc(20px + env(safe-area-inset-bottom, 0px)); inset-inline: 0; display: flex; justify-content: center; pointer-events: none; z-index: 60; padding-inline: 16px; }
+#toast div { background: var(--raised); color: var(--ink); border: 1px solid var(--gold); padding: 8px 20px; border-radius: 99px; box-shadow: var(--shadow); }
+
+/* ---------- فیش ---------- */
+.receipt { background: var(--paper); color: var(--paper-ink); width: min(320px, 100%); margin-inline: auto; padding: 18px 16px; font-size: .82rem; line-height: 1.7; font-variant-numeric: tabular-nums; }
+.receipt .c { text-align: center; }
+.receipt h4 { font-family: var(--f-display); font-size: 1.7rem; font-weight: 700; line-height: 1; }
+.receipt hr { border: 0; border-top: 1px dashed var(--paper-ink); margin: 8px 0; }
+.receipt table { width: 100%; border-collapse: collapse; }
+.receipt th { font-weight: 500; text-align: start; border-bottom: 1px solid var(--paper-ink); font-size: .74rem; }
+.receipt td, .receipt th { padding: 2px 0; }
+.receipt td:not(:first-child), .receipt th:not(:first-child) { text-align: end; padding-inline-start: 8px; white-space: nowrap; }
+.receipt .r { display: flex; justify-content: space-between; gap: 12px; }
+.receipt .big { font-size: 1.05rem; font-weight: 700; }
+#print { display: none; }
+@media print {
+  body { background: #fff; }
+  body > *:not(#print) { display: none !important; }
+  #print { display: block !important; }
+  .receipt { width: 72mm; }
+}
+
+/* سایت مشتری: سربرگ، صحنه اصلی، منو، داستان، رزرو و پابرگ. */
+
+/* ---------- سربرگ ---------- */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgb(10 9 7 / .82); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 18px; min-height: var(--header-height); }
+.mark { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.monogram { width: 40px; height: 40px; display: grid; place-items: center; flex: none; border: 1px solid var(--gold); transform: rotate(45deg); }
+.monogram b { transform: rotate(-45deg); font-family: var(--f-display); font-size: 1.5rem; font-weight: 700; color: var(--gold-hi); line-height: 1; }
+.mark .names { display: flex; flex-direction: column; line-height: 1.1; }
+.mark .names b { font-family: var(--f-display); font-size: 1.6rem; font-weight: 700; }
+.mark .names .latin { font-size: .52rem; color: var(--gold); }
+.nav { display: flex; gap: 4px; margin-inline-start: auto; }
+.nav button { position: relative; border: 0; background: none; padding: 6px 12px; color: var(--ink); }
+.nav button::after { content: ''; position: absolute; inset-inline: 12px; bottom: 2px; height: 1px; background: var(--gold); transform: scaleX(0); transition: transform .3s var(--ease); }
+.nav button:hover { color: var(--gold-hi); }
+.nav button:hover::after { transform: scaleX(1); }
+.cartbtn .n { background: var(--on-gold); color: var(--gold-hi); border-radius: 99px; min-width: 22px; height: 22px; display: inline-grid; place-items: center; font-size: .8rem; font-weight: 700; }
+@media (max-width: 860px) { .nav { display: none; } .top .wrap { justify-content: space-between; } .mark .names .latin { display: none; } }
+
+/* ---------- صحنه اصلی ---------- */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); background: radial-gradient(600px 420px at var(--mx, 25%) var(--my, 40%), rgb(212 175 106 / .13), transparent 70%); }
+.hero .dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero-in { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; padding-block: 64px 76px; }
+.hero h1 { font-size: clamp(3rem, 7vw, 5.6rem); font-weight: 700; }
+.hero h1 span { display: block; }
+.hero p { max-width: 46ch; margin-top: 18px; color: var(--muted); font-size: 1.04rem; }
+.hero .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+.hero .cta .btn { padding: 11px 24px; }
+
+.stage { position: relative; width: min(100%, 460px); aspect-ratio: 1; margin-inline: auto; min-width: 0; }
+.stage > * { position: absolute; }
+.stage .rays, .stage .ring-text { inset: 0; width: 100%; height: 100%; }
+.stage .ring-text text { font-family: var(--f-latin); font-size: 10.5px; letter-spacing: .34em; fill: var(--gold); }
+.stage .cup { inset: 17%; border-radius: 50%; overflow: hidden; border: 1px solid var(--gold); box-shadow: 0 0 0 8px var(--bg), 0 0 0 9px var(--gold-lo), 0 30px 80px rgb(0 0 0 / .7); }
+.stage .cup .pic { aspect-ratio: 1; height: 100%; }
+.stage .steam { inset: -4% 30% auto; width: 40%; height: 46%; pointer-events: none; }
+
+/* برگه عصاره‌گیری: زمان‌سنج زنده یک شات اسپرسو */
+.shot { inset-block-end: -4%; inset-inline-start: -6%; width: 216px; background: rgb(18 16 12 / .92); backdrop-filter: blur(8px); border: 1px solid var(--gold-lo); padding: 14px 16px; font-size: .82rem; line-height: 1.7; box-shadow: var(--shadow); }
+.shot h4 { font-family: var(--f-display); font-size: 1.15rem; font-weight: 600; color: var(--gold-hi); display: flex; justify-content: space-between; align-items: center; }
+.shot .live { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.shot dl { margin: 6px 0 8px; display: grid; grid-template-columns: auto 1fr; gap: 0 14px; }
+.shot dt { color: var(--muted); }
+.shot dd { margin: 0; text-align: end; }
+.shot .clock { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 8px; }
+.shot .clock b { font-size: 1.7rem; font-weight: 700; line-height: 1; color: var(--gold-hi); }
+.shot .bar { height: 3px; background: var(--line); margin-top: 8px; overflow: hidden; }
+.shot .bar i { display: block; height: 100%; width: 100%; background: var(--gold-foil); transform-origin: right; }
+@media (max-width: 860px) {
+  .hero-in { grid-template-columns: 1fr; padding-block: 40px 64px; }
+  .stage { max-width: 340px; margin-bottom: 96px; }
+  .shot { inset-inline-start: 0; inset-block-end: -30%; width: 196px; }
+}
+
+/* نوار متحرک زیر صحنه */
+.marquee { overflow: hidden; border-bottom: 1px solid var(--line); background: var(--surface); padding-block: 10px; direction: ltr; }
+.marquee .track { display: flex; width: max-content; }
+.marquee span { direction: rtl; white-space: nowrap; padding-inline: 22px; font-family: var(--f-display); font-size: 1.25rem; color: var(--gold); }
+.marquee span::after { content: '◆'; font-size: .6rem; margin-inline-start: 44px; vertical-align: middle; color: var(--gold-lo); }
+
+/* ---------- بخش‌ها ---------- */
+.sec { padding-block: 64px; }
+.sec-h { display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
+.sec-h h2 { font-size: clamp(2.2rem, 4.4vw, 3.2rem); }
+.sec-h > p { max-width: 52ch; font-size: .9rem; }
+
+/* انتخاب‌های ما: قاب‌های طاق‌دار */
+.sigs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 22px; }
+.sig { border: 0; background: none; padding: 0; text-align: start; display: flex; flex-direction: column; gap: 8px; color: var(--ink); }
+.sig .frame { position: relative; border-radius: 999px 999px var(--radius) var(--radius); overflow: hidden; border: 1px solid var(--gold-lo); transition: border-color .3s, box-shadow .4s; }
+.sig .pic { aspect-ratio: 4 / 4.8; transition: transform .7s var(--ease); }
+.sig:hover .frame { border-color: var(--gold-hi); box-shadow: var(--glow); }
+.sig:hover .pic { transform: scale(1.07); }
+.sig h3 { font-size: 1.5rem; }
+.sig .add-hint { position: absolute; inset-inline: 0; bottom: 0; padding: 22px 10px 10px; text-align: center; font-size: .85rem; color: var(--gold-hi); background: linear-gradient(transparent, rgb(0 0 0 / .85)); opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s var(--ease); }
+.sig:hover .add-hint, .sig:focus-visible .add-hint { opacity: 1; transform: none; }
+
+/* منو */
+.tools { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; flex: 1 1 320px; min-width: 0; scrollbar-width: thin; }
+.tabs button { border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 5px 16px; border-radius: 99px; white-space: nowrap; transition: border-color .2s, background .2s, color .2s; }
+.tabs button:hover { border-color: var(--gold); }
+.tabs button[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); border-color: var(--gold); font-weight: 600; }
+.search { flex: 0 1 240px; }
+.cat-h { display: flex; align-items: baseline; gap: 14px; margin: 38px 0 16px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.cat-h h3 { font-size: 1.9rem; color: var(--gold-hi); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+.card { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform .35s var(--ease), border-color .3s, box-shadow .35s; }
+.card:hover { transform: translateY(-5px); border-color: var(--gold-lo); box-shadow: var(--shadow); }
+.card .pic { transition: transform .7s var(--ease); }
+.card:hover .pic { transform: scale(1.05); }
+.card.off { opacity: .5; }
+.card .media { overflow: hidden; border-bottom: 1px solid var(--line); }
+.card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.card h4 { font-family: var(--f-display); font-size: 1.45rem; font-weight: 600; line-height: 1.2; }
+.card .en { color: var(--gold-lo); font-size: .56rem; }
+.card .desc { color: var(--muted); font-size: .88rem; line-height: 1.7; }
+.lab { font-size: .76rem; border: 1px dashed var(--gold-lo); color: var(--gold); padding: 1px 8px; border-radius: 2px; align-self: flex-start; }
+.card .foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 10px; }
+.price { font-weight: 700; font-size: 1.02rem; color: var(--gold-hi); }
+
+/* داستان ما */
+.story { background: var(--surface); border-block: 1px solid var(--line); }
+.story .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; }
+.story .fact { border-inline-start: 1px solid var(--gold-lo); padding-inline-start: 18px; }
+.story .big { font-family: var(--f-display); font-size: 4.2rem; font-weight: 700; line-height: 1; }
+.story .big small { font-size: 1.2rem; opacity: 1; color: var(--gold); -webkit-text-fill-color: var(--gold); }
+.story h3 { font-size: 1.5rem; margin-block: 6px; }
+.story p { color: var(--muted); }
+
+/* رزرو و تماس */
+.book { display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; min-width: 0; }
+.book h2 { font-size: 2.3rem; margin-bottom: 14px; }
+.info dl { margin: 0; display: grid; gap: 12px; }
+.info dt { font-size: .8rem; color: var(--muted); }
+.info dd { margin: 0; font-weight: 500; }
+@media (max-width: 860px) { .book { grid-template-columns: 1fr; } }
+
+.iglink { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; font-weight: 500; color: var(--gold); transition: color .2s; }
+.iglink:hover { color: var(--gold-hi); }
+
+.foot-site { border-top: 1px solid var(--gold-lo); background: var(--bg); padding-block: 28px; }
+.foot-site .wrap { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.foot-site .acts { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- پیگیری سفارش ---------- */
+.steps { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-block: 22px 16px; }
+.steps::before, .steps::after { content: ''; position: absolute; top: 6px; inset-inline: 12.5%; height: 2px; background: var(--line); }
+.steps::after { background: var(--gold-foil); transform-origin: right; transform: scaleX(var(--progress, 0)); transition: transform .8s var(--ease); }
+.steps div { position: relative; z-index: 1; text-align: center; font-size: .8rem; color: var(--muted); padding-top: 22px; }
+.steps div::before { content: ''; position: absolute; top: 0; inset-inline-start: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--line); }
+.steps div.on { color: var(--ink); font-weight: 600; }
+.steps div.on::before { background: var(--gold); border-color: var(--gold-hi); }
+
+/* پنل کارکنان: سفارش‌گیری، آشپزخانه و بار، مدیریت. فشرده‌تر و ابزاری‌تر از سایت مشتری. */
+.sbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgb(10 9 7 / .9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--gold-lo); }
+.sbar .in { display: flex; align-items: center; gap: 14px; padding: 8px 16px; flex-wrap: wrap; }
+.sbar .monogram { width: 30px; height: 30px; }
+.sbar .monogram b { font-size: 1.1rem; }
+.sbar .mark .names b { font-size: 1.3rem; }
+.stabs { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+.stabs button { border: 0; background: transparent; color: var(--muted); padding: 7px 14px; border-radius: var(--radius); white-space: nowrap; transition: color .2s, background .2s; }
+.stabs button:hover { color: var(--ink); }
+.stabs button[aria-pressed="true"] { background: var(--gold-soft); color: var(--gold-hi); font-weight: 600; }
+.sbar .clock { margin-inline-start: auto; color: var(--muted); }
+.mode-tag { font-size: .72rem; }
+@media (max-width: 700px) { .stabs { order: 5; flex-basis: 100%; } .sbar .clock { display: none; } .sbar .mode-tag { margin-inline-start: auto; } }
+
+.smain { padding: 18px 16px 60px; max-width: 1400px; margin-inline: auto; }
+.h-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.h-row h2 { font-size: 2rem; }
+.h-row.tight { margin: 0; }
+
+.login { max-width: 380px; margin: 8vh auto; background: var(--surface); border: 1px solid var(--gold-lo); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+.login h2 { font-size: 2.2rem; margin-bottom: 4px; }
+
+/* ---------- سالن ---------- */
+.zone { margin-bottom: 22px; }
+.zone h3 { font-size: 1.3rem; margin-bottom: 8px; color: var(--muted); }
+.floor { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+.tbl { border: 1px solid var(--line); border-top: 4px solid var(--ok); background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: 10px 12px; text-align: start; display: flex; flex-direction: column; gap: 2px; min-height: 104px; transition: transform .25s var(--ease), border-color .2s, box-shadow .25s; }
+.tbl:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: var(--shadow); }
+.tbl b { font-family: var(--f-display); font-size: 1.8rem; line-height: 1; }
+.tbl.busy { border-top-color: var(--bad); }
+.tbl.bill { border-top-color: var(--warn); }
+.tbl.res { border-top-color: var(--info); }
+.tbl .s { font-size: .78rem; color: var(--muted); }
+.tbl .amount { font-weight: 600; color: var(--gold-hi); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-inline-end: 5px; vertical-align: -1px; }
+
+/* ---------- ثبت سفارش ---------- */
+.pos { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+.picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 12px; }
+.pick { display: flex; gap: 10px; align-items: center; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: 8px; text-align: start; min-width: 0; transition: border-color .2s, transform .2s var(--ease); }
+.pick:hover:not(:disabled) { border-color: var(--gold); transform: translateY(-2px); }
+.pick:disabled { opacity: .45; cursor: not-allowed; }
+.pick span { min-width: 0; display: flex; flex-direction: column; line-height: 1.45; }
+.pick b { font-weight: 600; font-size: .9rem; }
+.pick small { opacity: 1; color: var(--gold); }
+.ticket { background: var(--surface); border: 1px solid var(--gold-lo); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 12px; position: sticky; top: calc(64px + env(safe-area-inset-top, 0px)); }
+.ticket h3 { font-size: 1.6rem; color: var(--gold-hi); }
+.tl { display: flex; flex-direction: column; gap: 8px; max-height: 44vh; overflow: auto; }
+.ti { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.ti .note { grid-column: 1 / -1; font-size: .82rem; padding: 3px 8px; }
+.ti .line-note { color: var(--warn); }
+.pay { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 980px) { .pos { grid-template-columns: 1fr; } .ticket { position: static; } }
+
+/* ---------- آشپزخانه و بار ---------- */
+.kds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.kcol { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 160px; }
+.kcol > h3 { font-size: 1.4rem; display: flex; justify-content: space-between; align-items: center; }
+.kt { background: var(--raised); border: 1px solid var(--line); border-inline-start: 4px solid var(--info); border-radius: var(--radius); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.kt.late { border-inline-start-color: var(--bad); }
+.kt .hd { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+.kt ul { margin: 0; padding: 0; list-style: none; }
+.kt li { display: flex; gap: 8px; font-weight: 500; }
+.kt li i { font-style: normal; color: var(--warn); font-weight: 400; font-size: .85rem; }
+@media (max-width: 860px) { .kds { grid-template-columns: 1fr; } }
+
+/* ---------- مدیریت ---------- */
+.atabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.atabs button { border: 0; background: none; padding: 8px 14px; border-bottom: 2px solid transparent; white-space: nowrap; color: var(--muted); transition: color .2s, border-color .2s; }
+.atabs button:hover { color: var(--ink); }
+.atabs button[aria-pressed="true"] { border-color: var(--gold); color: var(--gold-hi); font-weight: 600; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-block: 14px 16px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.kpi > span { font-size: .82rem; color: var(--muted); }
+.kpi b { display: block; font-size: 1.7rem; font-weight: 700; line-height: 1.4; color: var(--gold-hi); }
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.panel h3 { font-size: 1.4rem; margin-bottom: 2px; }
+.panel.narrow { max-width: 720px; }
+.bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; margin-top: 14px; border-bottom: 1px solid var(--line); }
+.bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; min-width: 0; gap: 3px; }
+.bar i { display: block; width: 100%; max-width: 38px; background: linear-gradient(var(--gold-hi), var(--gold-lo)); border-radius: 2px 2px 0 0; min-height: 1px; transform-origin: bottom; }
+.bar .v { font-size: .7rem; color: var(--muted); white-space: nowrap; }
+.xl { display: flex; gap: 5px; margin-top: 4px; }
+.xl span { flex: 1; text-align: center; font-size: .7rem; color: var(--muted); min-width: 0; overflow: hidden; }
+.rank { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.rank .r { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: .9rem; }
+.rank .r u { grid-column: 1 / -1; display: block; height: 4px; background: var(--gold-foil); border-radius: 2px; text-decoration: none; transform-origin: right; }
+.tw { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table.t { width: 100%; border-collapse: collapse; font-size: .9rem; }
+table.t th { font-weight: 500; color: var(--gold); font-size: .8rem; text-align: start; background: var(--bg); }
+table.t th, table.t td { padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+table.t td.w { white-space: normal; min-width: 180px; }
+table.t tr:last-child td { border-bottom: 0; }
+table.t tbody tr { transition: background .2s; }
+table.t tbody tr:hover { background: var(--gold-soft); }
+.imgrow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.imgrow .pic { width: 120px; border-radius: var(--radius); flex: none; border: 1px solid var(--line); }
+.imgrow .form { flex: 1; min-width: 200px; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+
+/*
+ * لایه شیشه‌ای. این فایل بعد از site.css و staff.css بار می‌شود و فقط جنس سطح‌ها را عوض می‌کند:
+ * زمینه نیمه‌شفاف، لبه روشن، برق باریک بالای هر سطح و نورهای محو پشت صفحه که از شیشه دیده می‌شوند.
+ * برای برگشتن به سطح‌های مات کافی است همین فایل از index.html برداشته شود.
+ */
+:root {
+  --glass: rgb(255 240 205 / .055);
+  --glass-hover: rgb(255 240 205 / .09);
+  --glass-deep: rgb(16 14 10 / .62);
+  --glass-line: rgb(246 227 168 / .16);
+  --glass-shine: inset 0 1px 0 rgb(255 255 255 / .1), inset 0 0 0 1px rgb(255 255 255 / .025);
+  --frost: blur(20px) saturate(150%);
+  --field: rgb(0 0 0 / .32);
+}
+
+/* ---------- نورهای محیطی ---------- */
+/* سه لکه نور بزرگ و محو، ثابت پشت صفحه؛ شیشه بدون چیزی در پشتش فقط یک مستطیل خاکستری است. */
+body::before, body::after, #app::before {
+  content: ''; position: fixed; z-index: -1; pointer-events: none;
+  width: 56vmax; height: 56vmax; border-radius: 50%; filter: blur(90px);
+}
+body::before { top: -20vmax; inset-inline-start: -14vmax; background: radial-gradient(circle, rgb(212 175 106 / .34), transparent 66%); }
+body::after { bottom: -24vmax; inset-inline-end: -16vmax; background: radial-gradient(circle, rgb(176 96 44 / .3), transparent 66%); }
+#app::before { top: 34%; inset-inline-start: 38%; width: 40vmax; height: 40vmax; background: radial-gradient(circle, rgb(246 227 168 / .13), transparent 66%); }
+
+/* ---------- سطح‌های درون صفحه ---------- */
+/*
+ * پشت این سطح‌ها فقط نورهای از پیش محوشده است، پس نیمه‌شفافیِ ساده همان ظاهر شیشه مات را می‌دهد
+ * و backdrop-filter (که روی ده‌ها کارت هنگام اسکرول سنگین است) لازم نیست.
+ */
+.card, .panel, .kpi, .kcol, .tbl, .pick, .tw, .login, .story, .marquee, .note-box, .empty {
+  background: var(--glass);
+  border-color: var(--glass-line);
+  box-shadow: var(--glass-shine);
+}
+.kt { background: var(--glass-hover); border-color: var(--glass-line); box-shadow: var(--glass-shine); }
+/* نوار رنگیِ وضعیت روی میزها و برگه‌های آشپزخانه باید از لبه شیشه‌ای مستثنا بماند */
+.tbl { border-top-color: var(--ok); }
+.kt { border-inline-start-color: var(--info); }
+.card:hover { background: var(--glass-hover); border-color: var(--gold-lo); box-shadow: var(--glass-shine), var(--shadow); }
+.tbl:hover, .pick:hover:not(:disabled) { background: var(--glass-hover); box-shadow: var(--glass-shine), var(--shadow); }
+.story { border-color: var(--glass-line); }
+.card .media, .cat-h, .atabs, table.t th, table.t td, .ti { border-color: var(--glass-line); }
+table.t th { background: rgb(0 0 0 / .28); }
+
+/* بازتاب مورب نور روی گوشه بالای شیشه */
+.card::after, .kpi::after, .tbl::after, .panel::after, .login::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(135deg, rgb(255 255 255 / .08), transparent 34%);
+}
+.kpi, .tbl, .panel, .login { position: relative; }
+
+.tabs button, .seg, .step, .btn:not(.primary):not([data-armed]) { background: var(--glass); border-color: var(--glass-line); }
+.btn:not(.primary):not([data-armed]):hover { background: var(--glass-hover); border-color: var(--gold); }
+.tabs button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); }
+.field input, .field select, .field textarea, .inp { background: var(--field); border-color: var(--glass-line); }
+.pill { box-shadow: inset 0 0 0 1px rgb(255 255 255 / .06); }
+
+/* ---------- سطح‌های شناور روی محتوا ---------- */
+/* این‌ها روی عکس‌ها و متن می‌نشینند، پس تار کردنِ واقعیِ پشتشان لازم است. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .top, .sbar, .drawer, .modal, .shot, .ticket, #toast div, .sig .add-hint {
+    -webkit-backdrop-filter: var(--frost);
+    backdrop-filter: var(--frost);
+  }
+  .top, .sbar { background: rgb(10 9 7 / .5); border-color: var(--glass-line); }
+  .drawer, .modal { background: var(--glass-deep); box-shadow: var(--glass-shine), var(--shadow); }
+  .shot { background: rgb(22 19 13 / .5); border-color: rgb(246 227 168 / .3); box-shadow: var(--glass-shine), var(--shadow); }
+  .ticket { background: rgb(22 19 13 / .5); box-shadow: var(--glass-shine), var(--shadow); }
+  #toast div { background: rgb(26 23 17 / .6); }
+  .scrim { background: rgb(0 0 0 / .5); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+}
+
+/* فیش کاغذ است، نه شیشه */
+.receipt { box-shadow: 0 10px 40px rgb(0 0 0 / .5); }
+
+/*
+ * همه حرکت‌ها یک‌جا. هر انیمیشن از حالت نهاییِ دیده‌شدنی شروع نمی‌شود مگر با کلاس یا رویداد؛
+ * اگر جاوااسکریپت یا انیمیشن غیرفعال باشد، صفحه کامل و خوانا می‌ماند.
+ */
+
+/* ---------- پرده ورود: حلقه طلایی که یک بار رسم می‌شود و کنار می‌رود ---------- */
+.preloader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--bg); pointer-events: none; animation: curtain .5s .9s var(--ease) forwards; }
+.preloader svg { width: 96px; height: 96px; }
+.preloader circle { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 290; stroke-dashoffset: 290; animation: draw .9s var(--ease) forwards; }
+.preloader text { font-family: var(--f-display); font-size: 40px; font-weight: 700; fill: var(--gold-hi); opacity: 0; animation: fade-in .5s .3s forwards; }
+@keyframes curtain { to { opacity: 0; visibility: hidden; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fade-in { to { opacity: 1; } }
+
+/* ---------- نورهای محیطی پشت شیشه: خیلی آرام جابه‌جا می‌شوند ---------- */
+body::before { animation: drift-a 26s ease-in-out infinite alternate; }
+body::after { animation: drift-b 32s ease-in-out infinite alternate; }
+@keyframes drift-a { to { transform: translate(-8vmax, 10vmax) scale(1.15); } }
+@keyframes drift-b { to { transform: translate(10vmax, -8vmax) scale(.9); } }
+
+/* ---------- صحنه اصلی ---------- */
+.shimmer { animation: shimmer 6s linear infinite; }
+@keyframes shimmer { to { background-position: -220% 0; } }
+
+.hero-copy > * { animation: rise .9s var(--ease) both; }
+.hero-copy > :nth-child(1) { animation-delay: 1.0s; }
+.hero-copy > :nth-child(2) { animation-delay: 1.1s; }
+.hero-copy > :nth-child(3) { animation-delay: 1.25s; }
+.hero-copy > :nth-child(4) { animation-delay: 1.4s; }
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+
+.stage .rays { animation: spin 90s linear infinite; }
+.stage .ring-text { animation: spin 40s linear infinite reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stage .cup { animation: float 7s ease-in-out infinite, pop 1s 1.1s var(--ease) both; }
+@keyframes float { 50% { translate: 0 -10px; } }
+@keyframes pop { from { opacity: 0; scale: .86; } }
+
+.steam path { fill: none; stroke: rgb(246 227 168 / .5); stroke-width: 3; stroke-linecap: round; filter: blur(2.5px); stroke-dasharray: 60 140; animation: steam 4.5s linear infinite; }
+.steam path:nth-child(2) { animation-delay: -1.5s; animation-duration: 5.5s; }
+.steam path:nth-child(3) { animation-delay: -3s; animation-duration: 5s; }
+@keyframes steam { from { stroke-dashoffset: 0; opacity: 0; } 20% { opacity: 1; } 80% { opacity: .5; } to { stroke-dashoffset: -200; opacity: 0; } }
+
+.shot { animation: rise .9s 1.5s var(--ease) both; }
+.shot .live { animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+
+.marquee .track { animation: marquee 38s linear infinite; }
+.marquee:hover .track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- ظاهرشدن با اسکرول (فقط مرورگرهایی که انیمیشن وابسته به اسکرول دارند) ---------- */
+@supports (animation-timeline: view()) {
+  .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+  /* شروع از شفافیت کامل نیست تا در چاپ یا عکس تمام‌صفحه، بخش‌های پایین خالی دیده نشوند. */
+  @keyframes reveal { from { opacity: .3; transform: translateY(36px) scale(.98); } }
+}
+
+/* ---------- ریزحرکت‌ها ---------- */
+.btn.primary::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgb(255 255 255 / .55) 50%, transparent 65%); transform: translateX(120%); }
+.btn.primary:hover::after { transform: translateX(-120%); transition: transform .7s var(--ease); }
+
+.bump { animation: bump .45s var(--ease); }
+@keyframes bump { 40% { transform: scale(1.18); } }
+
+.fly-dot { position: fixed; z-index: 70; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--gold-hi), var(--gold-lo)); box-shadow: 0 0 18px var(--gold); pointer-events: none; }
+
+.scrim { animation: fade-in .25s both; }
+.scrim.closing { animation: fade-out .2s both; }
+.drawer { animation: slide-in .4s var(--ease) both; }
+.modal { animation: modal-in .35s var(--ease) both; }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes slide-in { from { transform: translateX(-100%); } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+
+#toast div { animation: toast-in .35s var(--ease) both; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(14px); } }
+
+/* فیش مثل بیرون‌آمدن از چاپگر، از بالا به پایین باز می‌شود */
+.receipt.printing { animation: print-out 1.1s steps(22) both; }
+@keyframes print-out { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+
+.steps div.now::before { animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { from { box-shadow: 0 0 0 0 rgb(212 175 106 / .6); } to { box-shadow: 0 0 0 12px rgb(212 175 106 / 0); } }
+
+/* ---------- پنل کارکنان: فقط هنگام عوض‌شدن زبانه ---------- */
+.enter > * { animation: rise .45s var(--ease) both; }
+.enter > :nth-child(2) { animation-delay: .05s; }
+.enter > :nth-child(3) { animation-delay: .1s; }
+.enter > :nth-child(n+4) { animation-delay: .15s; }
+.enter .bar i { animation: grow-y .7s .2s var(--ease) both; }
+.enter .rank u { animation: grow-x .7s .2s var(--ease) both; }
+@keyframes grow-y { from { transform: scaleY(0); } }
+@keyframes grow-x { from { transform: scaleX(0); } }
+.kt.late .pill.bad { animation: blink 1.2s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .preloader { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="preloader" aria-hidden="true">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><text x="50" y="64" text-anchor="middle">ق</text></svg>
+  </div>
+  <div id="app"></div>
+  <div id="layer"></div>
+  <div id="toast" aria-live="polite"></div>
+  <div id="print"></div>
+<script>window.CAFE_DEMO = true;</script>
+<script>
+(()=>{var z="قهوه",ft="Ghahve Café",ke="1234",L=[{id:"espresso",name:"اسپرسو بار",en:"Espresso bar",station:"bar"},{id:"brew",name:"دمی‌ها",en:"Filter",station:"bar"},{id:"cold",name:"نوشیدنی سرد",en:"Cold",station:"bar"},{id:"tea",name:"چای و دمنوش",en:"Tea",station:"bar"},{id:"breakfast",name:"صبحانه",en:"Breakfast",station:"kitchen"},{id:"sandwich",name:"ساندویچ",en:"Sandwich",station:"kitchen"},{id:"main",name:"غذا",en:"Kitchen",station:"kitchen"},{id:"cake",name:"کیک و دسر",en:"Pâtisserie",station:"kitchen"}],Se={service:10,vat:10,phone:"۰۷۱-۵۵۵۰-۰۱۱۸",address:"شیراز، بلوار بهشت",hours:"هر روز از ۸ صبح تا ۱۲ شب",instagram:"https://instagram.com/ghahve.cafe"},wt=[0,5,10,15,20,30],Te=["card","cash"],Ee=["dinein","takeaway"],Ut=["queued","cooking","ready","served"],I={maxLinesPerOrder:40,maxQtyPerLine:20,maxGuests:8,maxRatePercent:30,maxTableSeats:30};var Ae={i1:"1510591509098-f4fdc6d0ff04",i2:"1519532059956-a63a37af5deb",i3:"1509042239860-f550ce710b93",i4:"1572442388796-11668a67e53d",i5:"1594671586855-eda12bfeb36f",i6:"1529892485617-25f63cd7b1e9",i7:"1545665613-29394cee622b",i8:"1574359172160-c7ae4fadcacc",i9:"1666950030199-d68343ea5a9a",i10:"1552640958-291d4a2e2ab2",i11:"1517701550927-30cf4ba1dba5",i12:"1461023058943-07fcbe16d735",i13:"1593412323862-55bd8bb39099",i14:"1594631661960-34762327295a",i15:"1653542772393-71ffa417b1c4",i16:"1579005162638-11c872e1586e",i17:"1515823064-d6e0c04616a7",i18:"1573784540576-21ddeff9479b",i19:"1561336526-2914f13ceb36",i20:"1525351484163-7529414344d8",i21:"1510693206972-df098062cb71",i22:"1528207776546-365bb710ee93",i23:"1691480162735-9b91238080f6",i24:"1580069491658-8220b0e8722d",i25:"1567234669003-dce7a7a88821",i26:"1630098897265-5c2a3f06209a",i27:"1621852004158-f3bc188ace2d",i28:"1700937314577-898450cafe35",i29:"1473093226795-af9932fe5856",i30:"1746211108786-ca20c8f80ecd",i31:"1476124369491-e7addf5db371",i32:"1694345598429-00511c301452",i33:"1635327173758-85badf17f995",i34:"1517427294546-5aa121f68e8a",i35:"1571877227200-a0d98ea607e9",i36:"1611338075094-a2926b902fc0",i37:"1676300186098-9b5ae9916e3c",i38:"1499636136210-6f4ee915583e"},za={width:640,height:480,quality:70},Ga="/img/menu/",Ya="remote";function Va(t,e="auto"){let a=Ae[t];if(!a)return null;let{width:s,height:i,quality:r}=za,n=e==="auto"?"auto=format":`fm=${e}`;return`https://images.unsplash.com/photo-${a}?${n}&fit=crop&w=${s}&h=${i}&q=${r}`}var Ka=t=>`${Ga}${t}.jpg`;function kt(t){return Ae[t]?Ya==="local"?Ka(t):Va(t):null}var D=class extends Error{constructor(e,a){super(a),this.name="AppError",this.status=e}},Bt=t=>Number(t).toLocaleString("fa-IR");function St(t=Date.now()){let e=new Date(t);return e.setHours(0,0,0,0),e.getTime()}function _(t){let e=new Date(t),a=s=>String(s).padStart(2,"0");return`${e.getFullYear()}-${a(e.getMonth()+1)}-${a(e.getDate())}`}function st(t){let e=t>>>0;return()=>{e=e+1831565813|0;let a=Math.imul(e^e>>>15,1|e);return a=a+Math.imul(a^a>>>7,61|a)^a,((a^a>>>14)>>>0)/4294967296}}function Tt(t=16){let e=crypto.getRandomValues(new Uint8Array(t));return Array.from(e,a=>a.toString(16).padStart(2,"0")).join("")}var zt={espresso:"#16120b",brew:"#1a140d",cold:"#0e1517",tea:"#15160d",breakfast:"#1c1710",sandwich:"#131610",main:"#1a1113",cake:"#1b1216"};function Oe(){let t=0,e=(r,n,c,l,p,u,m,h={})=>{let b="i"+ ++t;return{id:b,cat:r,name:n,en:c,price:l,desc:p,art:[u,m,zt[r]],img:kt(b),avail:!0,...h}},a=["#6fa955",10,"wave"],s=["#d6432f",9,"rounds"],i=["#f4c542",7,"drip"];return[e("espresso","اسپرسو مخصوص","Espresso",165e3,"ترکیب اختصاصی ۷۰٪ عربیکا برزیل و اتیوپی؛ بدنه شکلاتی با پایان مرکباتی.","cup",{art:"crema"},{lab:"۱۸ گرم ← ۳۶ گرم · ۲۸ ثانیه · ۹۳°",sig:!0}),e("espresso","کورتادو","Cortado",195e3,"اسپرسوی دوبل با همان اندازه شیر بخاردیده؛ کوتاه و پررنگ.","cup",{liq:"#a8703c",art:"heart"},{lab:"۱۸ گرم ← ۳۶ گرم · شیر ۶۰ میلی‌لیتر"}),e("espresso","فلت وایت","Flat white",225e3,"ریسترتوی دوبل و میکروفوم مخملی، سرو در فنجان ۱۶۰ میلی‌لیتری.","cup",{liq:"#b07a45",art:"rosetta"},{lab:"۲۰ گرم ← ۳۰ گرم · ۲۴ ثانیه"}),e("espresso","کاپوچینو","Cappuccino",235e3,"یک‌سوم اسپرسو، یک‌سوم شیر، یک‌سوم فوم؛ با پودر کاکائوی هلندی.","cup",{liq:"#a8703c",art:"foam"}),e("espresso","لاته زعفران و هل","Saffron latte",285e3,"لاته با شربت زعفران قائنات و هل تازه‌کوبیده.","cup",{liq:"#d9a53e",art:"rosetta",garnish:"saffron"},{sig:!0}),e("espresso","موکا شکلات تلخ","Dark mocha",275e3,"اسپرسو با گاناش شکلات ۷۰٪ و شیر بخاردیده.","cup",{liq:"#6b3d1e",art:"foam",dust:"#2a160c"}),e("brew","وی‌شصت اتیوپی گوجی","V60 · Guji",32e4,"فرآوری شسته؛ یاس، هلو و چای ارل‌گری. دم‌آوری جلوی میز شما.","brew",{kind:"v60"},{lab:"۱۵ گرم ← ۲۵۰ گرم · ۲:۴۵ · ۹۴°",sig:!0}),e("brew","کمکس دونفره","Chemex for two",48e4,"کنیا نیری AA؛ تمیز و شفاف با اسیدیته انگور سیاه.","brew",{kind:"chemex"},{lab:"۳۰ گرم ← ۵۰۰ گرم · ۴:۱۵ · ۹۵°"}),e("brew","ایروپرس کلمبیا","AeroPress · Huila",29e4,"کلمبیا اوئیلا؛ کارامل، سیب قرمز و بدنه گرد.","brew",{kind:"aeropress"},{lab:"۱۶ گرم ← ۲۲۰ گرم · ۱:۵۰ · ۸۸°"}),e("brew","سایفون گیشا پاناما","Siphon · Geisha",89e4,"میکرولات گیشا از بوکته؛ برگاموت و عسل. تعداد محدود در هر روز.","brew",{kind:"siphon"},{lab:"۲۰ گرم ← ۳۰۰ گرم · ۱:۳۰ · ۹۲°"}),e("cold","کلدبرو ۱۸ ساعته","Cold brew",26e4,"خیساندن سرد ۱۸ ساعته، فیلتر دوباره؛ سرو روی یخ شفاف.","glass",{layers:[["#2a160c",1]],ice:3},{lab:"۱ به ۸ · ۱۸ ساعت · ۴°"}),e("cold","آیس لاته","Iced latte",245e3,"اسپرسوی دوبل روی شیر سرد و یخ.","glass",{layers:[["#f1e3c9",.5],["#c99a63",.25],["#5a3320",.25]],ice:5,straw:1}),e("cold","اسپرسو تونیک","Espresso tonic",265e3,"تونیک خشک، اسپرسوی اتیوپی و پوست پرتقال.","glass",{layers:[["#e9e2c4",.55],["#a8642c",.2],["#3b2212",.25]],ice:8,garnish:"orange"}),e("cold","آفوگاتو وانیل ماداگاسکار","Affogato",295e3,"بستنی وانیل دست‌ساز زیر یک شات اسپرسوی داغ.","glass",{layers:[["#3b2212",.45]],short:1,garnish:"scoop"}),e("cold","لیموناد نعنا و ریحان","Basil lemonade",22e4,"لیموی تازه، نعنا، ریحان و سودا.","glass",{layers:[["#d9e3a0",.6],["#bfd27a",.4]],ice:11,straw:1,garnish:"mint"}),e("tea","چای سیاه لاهیجان با هل","Lahijan black tea",16e4,"چای بهاره لاهیجان، دم‌شده در قوری چدنی.","cup",{liq:"#a8431c",art:"plain",garnish:"pods"}),e("tea","ماچا لاته","Matcha latte",31e4,"ماچای تشریفاتی اوجی، هم‌زده با چاسن و شیر بخاردیده.","cup",{liq:"#8fae5a",art:"heart"},{lab:"۲ گرم · ۷۰ میلی‌لیتر · ۸۰°"}),e("tea","دمنوش به‌لیمو و گل‌سرخ","Verbena & rose",19e4,"به‌لیمو، غنچه گل محمدی و کمی عسل.","cup",{liq:"#d9b24a",art:"plain",garnish:"rose"}),e("tea","چای ماسالا","Masala chai",23e4,"چای سیاه آسام با شیر، دارچین، زنجبیل و بادیان.","cup",{liq:"#c08a52",art:"plain",garnish:"anise"}),e("breakfast","تست آووکادو و تخم‌مرغ پوچ","Avocado toast",42e4,"نان خمیرترش، آووکادو، تخم‌مرغ پوچ و فلفل حلب.","plate",{kind:"avotoast"}),e("breakfast","املت ترافل","Truffle omelette",465e3,"املت فرانسوی سه‌تخم‌مرغ با ترافل سیاه و تره‌فرنگی.","plate",{kind:"omelette"},{sig:!0}),e("breakfast","پنکیک ریکوتا با توت‌ها","Ricotta pancakes",395e3,"سه لایه پنکیک ریکوتا، شیره افرا، کره و توت تازه.","plate",{kind:"pancake"}),e("breakfast","کروسان کره‌ای","Butter croissant",185e3,"کره نرماندی، ۲۷ لایه؛ هر صبح در کافه پخته می‌شود. با مربای تمشک.","plate",{kind:"croissant"}),e("breakfast","صبحانه ایرانی مخصوص","Persian breakfast",52e4,"پنیر لیقوان، گردو، خیار و گوجه، سنگک تازه، زیتون و مربا.","plate",{kind:"persian"}),e("sandwich","کلاب ساندویچ بوقلمون","Turkey club",495e3,"بوقلمون دودی، بیکن گوساله، کاهو، گوجه و سس خردل عسل.","sandwich",{fill:[["#e6c9a0",12],i,s,a]}),e("sandwich","کروسان سالمون دودی","Salmon croissant",585e3,"سالمون دودی، پنیر خامه‌ای، کبر و شوید در کروسان کره‌ای.","sandwich",{top:"croissant",bread:"#d99a45",fill:[["#fffdf5",9],["#ee8a6a",12,"wave"],["#5b9647",6,"wave"]]}),e("sandwich","پنینی مرغ و پستو","Chicken pesto panini",445e3,"مرغ گریل، پستوی ریحان، موتزارلا و گوجه خشک.","sandwich",{top:"grill",bread:"#c98b3f",fill:[["#f0e2c0",12],["#fffdf5",8,"drip"],["#5b9647",6],["#b3392f",6,"rounds"]]}),e("sandwich","استیک ساندویچ","Steak sandwich",69e4,"راسته گوساله، پیاز کاراملی، آروگولا و سس فلفل در نان چاباتا.","sandwich",{bread:"#b98042",fill:[["#6a3524",16],["#a8642c",7,"wave"],i,a]}),e("main","پاستا ترافل و قارچ","Truffle tagliatelle",64e4,"تالیاتله تازه، قارچ پورچینی، خامه و ترافل سیاه.","plate",{kind:"pasta"}),e("main","سالاد سزار با مرغ گریل","Caesar salad",485e3,"کاهوی رومی، مرغ گریل، کروتان سیر و پارمزان ۲۴ماهه.","plate",{kind:"salad"}),e("main","ریزوتو زعفران","Saffron risotto",59e4,"برنج کارنارولی، زعفران قائنات، کره و پارمزان.","plate",{kind:"risotto"}),e("main","فیله مینیون","Filet mignon",135e4,"۲۰۰ گرم فیله گوساله، مارچوبه، سس دمی‌گلاس و کره سبزیجات.","plate",{kind:"steak",plate:"#f1eee4"}),e("cake","چیزکیک سن‌سباستین","Basque cheesecake",345e3,"رویه سوخته، مغز خامه‌ای؛ با سس شکلات گرم.","slice",{layers:[["#f3dfa6",74]],topc:"#6b3a1a",garnish:"burnt"},{sig:!0}),e("cake","کیک شکلات بدون آرد","Flourless chocolate",32e4,"شکلات ۷۰٪، بادام و نمک دریایی.","slice",{layers:[["#3b2212",60],["#231209",12]],topc:"#2a160c",garnish:"berry"}),e("cake","تیرامیسو","Tiramisu",335e3,"ماسکارپونه، لیدی‌فینگر آغشته به اسپرسوی خودمان و کاکائو.","slice",{layers:[["#8a5a2b",14],["#f6ecd4",20],["#8a5a2b",14],["#f6ecd4",24]],topc:"#5a3320",garnish:"cocoa"}),e("cake","تارت پسته و تمشک","Pistachio tart",365e3,"خمیر سابله، کرم پسته کرمان و تمشک تازه.","plate",{kind:"tart"}),e("cake","کیک هویج و گردو","Carrot cake",285e3,"هویج، گردو و دارچین با فراستینگ پنیر خامه‌ای.","slice",{layers:[["#c98432",24],["#fffaf0",8],["#c98432",24],["#fffaf0",8]],topc:"#fffaf0",garnish:"walnut"}),e("cake","کوکی شکلات و نمک دریایی","Sea-salt cookie",145e3,"کره قهوه‌ای، تکه‌های شکلات تلخ و نمک پَرَک.","plate",{kind:"cookie"})]}function Ie(){let t=[];for(let e=1;e<=8;e++)t.push({id:"t"+e,name:Bt(e),zone:"سالن",seats:e%3===0?4:2});for(let e=9;e<=12;e++)t.push({id:"t"+e,name:Bt(e),zone:"تراس",seats:4});return t.push({id:"t13",name:"VIP ۱",zone:"اتاق VIP",seats:8},{id:"t14",name:"VIP ۲",zone:"اتاق VIP",seats:6}),t}function Me(t){let e={espresso:["cup",{art:"crema"}],brew:["brew",{kind:"v60"}],cold:["glass",{layers:[["#5a3320",1]],ice:4}],tea:["cup",{liq:"#a8431c",art:"plain"}],breakfast:["plate",{kind:"croissant"}],sandwich:["sandwich",{fill:[["#e6c9a0",12],["#6fa955",10,"wave"]]}],main:["plate",{kind:"salad"}],cake:["slice",{layers:[["#f3dfa6",70]],topc:"#6b3a1a"}]};return[...e[t]??e.espresso,zt[t]??zt.espresso]}var Gt=(t,e)=>Math.round(t*e/100);function X(t,e){let a=t.lines.reduce((c,l)=>c+l.price*l.qty,0),s=Gt(a,t.discount||0),i=a-s,r=t.type==="dinein"?Gt(i,e.service):0,n=Gt(i+r,e.vat);return{sub:a,disc:s,service:r,vat:n,total:i+r+n,serviceRate:e.service,vatRate:e.vat}}var Qa=1e3,Re=3,Wa=20261009,Za=7,Xa=8,Fe=[3,5,6,5,4,6,7,5,4,6,8,9,9,8,6,3],Yt="۰۹۱۲۰۰۰۰۰۰۰";function At({withDemoData:t=!0,now:e=Date.now()}={}){let a={version:Re,seq:Qa,settings:{...Se},items:Oe(),tables:Ie(),orders:[],reservations:[]};return t&&(ts(a,e),es(a,e),as(a,e)),a}function Ja(t){return L.find(e=>e.id===t.cat).station}function Le(t,e,a,s,i){return{id:"l"+ ++t.seq,itemId:e.id,name:e.name,price:e.price,qty:a,note:"",state:s,station:Ja(e),sentAt:i}}function Ce(t,e){let a={id:"o"+ ++t.seq,code:t.seq,token:Tt(),lines:[],discount:0,customer:{},source:"pos",demo:!0,...e};return t.orders.push(a),a}function ts(t,e){let a=st(Wa),s=Fe.reduce((n,c)=>n+c,0),i=()=>{let n=a()*s,c=Fe.findIndex(l=>(n-=l)<=0);return Xa+Math.max(c,0)},r=()=>t.items[Math.floor(a()*a()*t.items.length*1.6)%t.items.length];for(let n=Za-1;n>=0;n--){let c=St(e-n*864e5),l=24+Math.floor(a()*14);for(let p=0;p<l;p++){let u=c+i()*36e5+Math.floor(a()*36e5);if(u>e-20*6e4)continue;let m=a()<.78,h=Ce(t,{type:m?"dinein":"takeaway",tableId:m?t.tables[Math.floor(a()*t.tables.length)].id:null,status:"paid",createdAt:u,paidAt:u+(20+a()*50)*6e4,discount:a()<.08?10:0,method:a()<.72?"card":"cash"}),b=1+Math.floor(a()*4);for(let g=0;g<b;g++)h.lines.push(Le(t,r(),a()<.25?2:1,"served",u));h.sums=X(h,t.settings)}}}function es(t,e){let a=i=>t.items.find(r=>r.id===i),s=(i,r,n,c={})=>{let l=e-r*6e4,p=Ce(t,{type:i?"dinein":"takeaway",tableId:i,status:"open",createdAt:l,...c});p.lines=n.map(([u,m,h])=>Le(t,a(u),m,h,l))};s("t3",7,[["i3",2,"cooking"],["i21",1,"cooking"],["i23",2,"queued"]]),s("t7",48,[["i7",1,"served"],["i33",2,"served"]]),s("t10",13,[["i12",2,"ready"],["i25",1,"cooking"],["i30",1,"cooking"]]),s(null,3,[["i11",2,"queued"],["i38",3,"queued"]],{customer:{name:"نگار (نمونه)",phone:Yt},source:"site"})}function as(t,e){t.reservations.push({id:"r"+ ++t.seq,name:"خانم رستگار (نمونه)",phone:Yt,date:_(e),time:"20:30",guests:6,note:"تولد؛ کیک را خودمان می‌آوریم",status:"confirmed",tableId:"t13",createdAt:e-5*36e5},{id:"r"+ ++t.seq,name:"آقای موحد (نمونه)",phone:Yt,date:_(e+864e5),time:"10:00",guests:2,note:"",status:"pending",tableId:null,createdAt:e-36e5})}function qe(t){return(t.version??1)<3&&t.items.forEach(a=>{a.img??=kt(a.id)}),t.version=Re,t}var ss=["pending","confirmed","cancelled"],is={queued:"cooking",cooking:"ready",ready:"served"},T={name:60,phone:20,note:200,desc:400,short:120},$=(t,e)=>{throw new D(t,e)},E=(t,e)=>String(t??"").trim().slice(0,e),ht=(t,e)=>`${e}${++t.seq}`,ns=t=>L.find(e=>e.id===t.cat)?.station??"kitchen",it=(t,e)=>t.items.find(a=>a.id===e)??$(404,"این آیتم در منو پیدا نشد."),mt=(t,e)=>t.tables.find(a=>a.id===e)??$(404,"این میز پیدا نشد."),rs=(t,e)=>t.orders.find(a=>a.id===e)??$(404,"این سفارش پیدا نشد."),os=(t,e)=>t.reservations.find(a=>a.id===e)??$(404,"این رزرو پیدا نشد.");function J(t,e){let a=rs(t,e);return a.status!=="open"&&$(409,"این سفارش قبلاً بسته شده است."),a}var nt=(t,e)=>t.orders.find(a=>a.status==="open"&&a.tableId===e);function Kt(t){t.avail||$(409,`«${t.name}» فعلاً تمام شده است.`)}function bt(t,e,a,s){let i=Number(t);return(!Number.isInteger(i)||i<e||i>a)&&$(400,s),i}function Vt(t,e,{qty:a=1,note:s="",state:i="draft"}={}){return{id:ht(t,"l"),itemId:e.id,name:e.name,price:e.price,qty:a,note:s,state:i,station:ns(e),sentAt:i==="draft"?null:Date.now()}}function De(t,{type:e,tableId:a=null,customer:s={},source:i}){let r={id:ht(t,"o"),code:t.seq,token:Tt(),type:e,tableId:a,lines:[],status:"open",createdAt:Date.now(),discount:0,customer:s,source:i};return t.orders.push(r),r}var cs=(t,e)=>{t.orders=t.orders.filter(a=>a!==e)};function rt(t){if(t.status!=="open")return t.status;let e=t.lines.filter(a=>a.state!=="draft");return e.length?Ut[Math.min(...e.map(a=>Ut.indexOf(a.state)))]:"draft"}var Qt=(t,e)=>t.status==="paid"&&t.sums?t.sums:X(t,e);function ls(t){return{settings:{...t.settings},items:t.items,tables:t.tables.map(({id:e,name:a,zone:s,seats:i})=>({id:e,name:a,zone:s,seats:i}))}}function ds(t){let{settings:e,items:a,tables:s,orders:i,reservations:r}=t;return{settings:e,items:a,tables:s,orders:i,reservations:r}}function ps(t,e){return{id:e.id,code:e.code,type:e.type,status:e.status,stage:rt(e),tableName:e.tableId?t.tables.find(a=>a.id===e.tableId)?.name??"":"",lines:e.lines.map(({name:a,qty:s,state:i})=>({name:a,qty:s,state:i})),sums:Qt(e,t.settings)}}function fs(t,e){return(!Array.isArray(e)||!e.length)&&$(400,"سبد سفارش خالی است."),e.length>I.maxLinesPerOrder&&$(400,"تعداد اقلام سفارش بیش از حد مجاز است."),e.map(({itemId:a,qty:s})=>{let i=it(t,a);return Kt(i),{item:i,qty:bt(s,1,I.maxQtyPerLine,"تعداد هر آیتم باید بین ۱ تا ۲۰ باشد.")}})}function Pe(t){let e=E(t.name,T.name);e||$(400,"نام آیتم را وارد کنید."),L.some(s=>s.id===t.cat)||$(400,"دسته‌بندی انتخاب‌شده معتبر نیست.");let a=Number(t.price);return(!Number.isInteger(a)||a<=0)&&$(400,"قیمت را به عدد وارد کنید."),{name:e,cat:t.cat,price:a,en:E(t.en,T.name),desc:E(t.desc,T.desc),lab:E(t.lab,T.short),avail:!!t.avail,sig:!!t.sig,img:t.img?String(t.img):null}}function us(t){let e=E(t.name,T.name),a=E(t.phone,T.phone);e||$(400,"نام را وارد کنید."),a||$(400,"شماره موبایل را وارد کنید."),(!/^\d{4}-\d{2}-\d{2}$/.test(t.date)||t.date<_(Date.now()))&&$(400,"روز رزرو معتبر نیست."),/^\d{2}:\d{2}$/.test(t.time)||$(400,"ساعت رزرو معتبر نیست.");let s=bt(t.guests,1,I.maxGuests,"تعداد مهمان باید بین ۱ تا ۸ نفر باشد.");return{name:e,phone:a,date:t.date,time:t.time,guests:s,note:E(t.note,T.note)}}var Wt={bootstrap:t=>ls(t),staffState:t=>ds(t),createCustomerOrder(t,e){Ee.includes(e.type)||$(400,"نوع سفارش معتبر نیست.");let a=e.type==="dinein",s={name:E(e.name,T.name),phone:E(e.phone,T.phone)};s.name||$(400,"نام را وارد کنید."),!a&&!s.phone&&$(400,"برای سفارش بیرون‌بر شماره موبایل لازم است."),a&&mt(t,e.tableId);let i=fs(t,e.lines),r=a&&nt(t,e.tableId)||De(t,{type:e.type,tableId:a?e.tableId:null,customer:s,source:"site"}),n=E(e.note,T.note);return i.forEach(({item:c,qty:l},p)=>{r.lines.push(Vt(t,c,{qty:l,note:p===0?n:"",state:"queued"}))}),{id:r.id,token:r.token}},trackOrder(t,{id:e,token:a}){let s=t.orders.find(i=>i.id===e&&i.token===a);return s?ps(t,s):$(404,"سفارشی با این مشخصات پیدا نشد.")},createReservation(t,e){let a={id:ht(t,"r"),...us(e),status:"pending",tableId:null,createdAt:Date.now()};return t.reservations.push(a),{id:a.id}},createOrder(t,{tableId:e=null,itemId:a}){e&&(mt(t,e),nt(t,e)&&$(409,"این میز سفارش باز دارد."));let s=it(t,a);Kt(s);let i=De(t,{type:e?"dinein":"takeaway",tableId:e,source:"pos"});return i.lines.push(Vt(t,s)),{orderId:i.id}},addLine(t,{id:e,itemId:a}){let s=J(t,e),i=it(t,a);Kt(i);let r=s.lines.find(n=>n.itemId===i.id&&n.state==="draft"&&!n.note);return r?r.qty=Math.min(r.qty+1,I.maxQtyPerLine):s.lines.push(Vt(t,i)),{orderId:s.id}},updateLine(t,{id:e,lineId:a,qty:s,note:i}){let r=J(t,e),n=r.lines.find(c=>c.id===a)??$(404,"این قلم در سفارش نیست.");return n.state!=="draft"&&$(409,"این قلم به آشپزخانه فرستاده شده و قابل تغییر نیست."),i!==void 0&&(n.note=E(i,T.note)),s!==void 0&&(n.qty=bt(s,0,I.maxQtyPerLine,"تعداد معتبر نیست."),n.qty===0&&(r.lines=r.lines.filter(c=>c!==n))),r.lines.length||cs(t,r),{removed:!r.lines.length}},sendOrder(t,{id:e}){let s=J(t,e).lines.filter(r=>r.state==="draft");s.length||$(409,"قلم جدیدی برای ارسال وجود ندارد.");let i=Date.now();return s.forEach(r=>{r.state="queued",r.sentAt=i}),{sent:s.length}},updateOrder(t,{id:e,discount:a,tableId:s}){let i=J(t,e);return a!==void 0&&(wt.includes(Number(a))||$(400,"درصد تخفیف معتبر نیست."),i.discount=Number(a)),s!==void 0&&s!==i.tableId&&(i.type!=="dinein"&&$(409,"سفارش بیرون‌بر میز ندارد."),mt(t,s),nt(t,s)&&$(409,"میز مقصد سفارش باز دارد."),i.tableId=s),{orderId:i.id}},payOrder(t,{id:e,method:a}){let s=J(t,e);return Te.includes(a)||$(400,"روش پرداخت معتبر نیست."),s.lines.some(i=>i.state==="draft")&&$(409,"اول اقلام جدید را ارسال یا حذف کنید."),s.lines.forEach(i=>{i.state="served"}),s.sums=X(s,t.settings),Object.assign(s,{status:"paid",paidAt:Date.now(),method:a}),{orderId:s.id}},cancelOrder(t,{id:e}){let a=J(t,e);return a.status="cancelled",{orderId:a.id}},advanceLines(t,{id:e,from:a,station:s="all"}){let i=J(t,e),r=is[a]??$(400,"وضعیت معتبر نیست."),n=i.lines.filter(c=>c.state===a&&(s==="all"||c.station===s));return n.forEach(c=>{c.state=r}),{moved:n.length}},createItem(t,e){let a=Pe(e),s={id:ht(t,"i"),art:Me(a.cat),...a};return t.items.push(s),{id:s.id}},updateItem(t,{id:e,...a}){return Object.assign(it(t,e),Pe(a)),{id:e}},setItemAvailability(t,{id:e,avail:a}){return it(t,e).avail=!!a,{id:e}},deleteItem(t,{id:e}){return it(t,e),t.items=t.items.filter(a=>a.id!==e),{id:e}},createTable(t,e){let a=E(e.name,T.name),s=E(e.zone,T.name);(!a||!s)&&$(400,"نام میز و بخش را وارد کنید.");let i=bt(e.seats,1,I.maxTableSeats,"ظرفیت میز معتبر نیست."),r={id:ht(t,"t"),name:a,zone:s,seats:i};return t.tables.push(r),{id:r.id}},deleteTable(t,{id:e}){return mt(t,e),nt(t,e)&&$(409,"این میز سفارش باز دارد و قابل حذف نیست."),t.tables=t.tables.filter(a=>a.id!==e),t.reservations.forEach(a=>{a.tableId===e&&Object.assign(a,{tableId:null,status:a.status==="confirmed"?"pending":a.status})}),{id:e}},updateReservation(t,{id:e,status:a,tableId:s}){let i=os(t,e);return s!==void 0&&(s&&mt(t,s),i.tableId=s||null,!i.tableId&&i.status==="confirmed"&&(i.status="pending")),a!==void 0&&(ss.includes(a)||$(400,"وضعیت رزرو معتبر نیست."),a==="confirmed"&&!i.tableId&&$(409,"برای تأیید، اول یک میز انتخاب کنید."),i.status=a),{id:e}},updateSettings(t,e){let a=s=>bt(s,0,I.maxRatePercent,"درصد باید بین ۰ تا ۳۰ باشد.");return Object.assign(t.settings,{service:a(e.service),vat:a(e.vat),address:E(e.address,T.short),phone:E(e.phone,T.phone),hours:E(e.hours,T.short),instagram:E(e.instagram,T.short)}),{}},resetDemo(t){let{seq:e,settings:a,items:s,tables:i,orders:r,reservations:n}=At();return Object.assign(t,{seq:e,settings:a,items:s,tables:i,orders:r,reservations:n}),{}},clearOrders(t){return t.orders=[],t.reservations=[],{}}};var v=(t,e=document)=>e.querySelector(t),_e=(t,e=document)=>[...e.querySelectorAll(t)],ms={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"},d=t=>String(t??"").replace(/[&<>"']/g,e=>ms[e]),Ne="۰۱۲۳۴۵۶۷۸۹",f=t=>Number(t).toLocaleString("fa-IR"),C=t=>Number(t).toLocaleString("fa-IR",{useGrouping:!1}),Zt=t=>String(t).replace(/\d/g,e=>Ne[e]),$t=t=>String(t).replace(/[۰-۹]/g,e=>Ne.indexOf(e)).replace(/[٠-٩]/g,e=>"٠١٢٣٤٥٦٧٨٩".indexOf(e)),x=t=>`<span class="num">${f(Math.round(t))}</span> <small>تومان</small>`,j=t=>new Date(t).toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit"}),Ot=t=>new Date(t).toLocaleDateString("fa-IR",{weekday:"long",day:"numeric",month:"long"}),It=t=>new Date(t).toLocaleDateString("fa-IR",{month:"numeric",day:"numeric"}),je=t=>new Date(t).toLocaleDateString("fa-IR"),He=t=>new Date(t).toLocaleDateString("fa-IR",{weekday:"short"}),Mt=t=>Zt(t),Xt=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;function Ue(t){let e={};return{get(a){try{let s=t().getItem(a);return s?JSON.parse(s):e[a]??null}catch{return e[a]??null}},set(a,s){e[a]=s;try{t().setItem(a,JSON.stringify(s))}catch{}},remove(a){delete e[a];try{t().removeItem(a)}catch{}}}}var P=Ue(()=>localStorage),Jt=Ue(()=>sessionStorage);var Be="cafe-ghahve.cart",te="cafe-ghahve.my-order",Ft=()=>({settings:{service:0,vat:0},items:[],tables:[],orders:[],reservations:[],pinHint:null}),o={db:Ft(),cart:P.get(Be)??{lines:[],type:"dinein",tableId:""},myOrder:P.get(te),tracked:null,ui:{view:"site",authed:!1,layer:null,menuCat:"all",menuQuery:"",staffTab:"pos",adminTab:"dash",pos:null,posCat:"espresso",kdsStation:"all",orderFilter:"open",draftImage:null}},vt=()=>P.set(Be,o.cart);function ee(t){o.myOrder=t,t?P.set(te,t):P.remove(te)}var tt=t=>o.db.items.find(e=>e.id===t),Rt=t=>o.db.tables.find(e=>e.id===t),et=t=>o.db.orders.find(e=>e.id===t),G=()=>o.db.orders.filter(t=>t.status==="open"),Y=t=>nt(o.db,t),V=t=>Qt(t,o.db.settings),ze=()=>o.cart.lines.reduce((t,e)=>t+e.qty,0);function Lt(t){let e=Y(t.id);if(e)return e.lines.every(i=>i.state==="served")?"bill":"busy";let a=_(Date.now());return o.db.reservations.some(i=>i.status==="confirmed"&&i.tableId===t.id&&i.date===a)?"res":"free"}function ot(t){return t.type==="dinein"?`میز ${d(Rt(t.tableId)?.name??"—")}`:t.source==="site"?"بیرون‌بر (سایت)":"بیرون‌بر"}var y=(t,e,a,s)=>({name:t,method:e,path:a,access:s}),hs=[y("bootstrap","GET","/api/bootstrap","public"),y("createCustomerOrder","POST","/api/orders","public"),y("trackOrder","GET","/api/orders/:id/track","public"),y("createReservation","POST","/api/reservations","public"),y("login","POST","/api/auth/login","public"),y("logout","POST","/api/auth/logout","public"),y("changePin","PUT","/api/staff/pin","staff"),y("staffState","GET","/api/staff/state","staff"),y("events","GET","/api/staff/events","staff"),y("createOrder","POST","/api/staff/orders","staff"),y("updateOrder","PATCH","/api/staff/orders/:id","staff"),y("addLine","POST","/api/staff/orders/:id/lines","staff"),y("updateLine","PATCH","/api/staff/orders/:id/lines/:lineId","staff"),y("sendOrder","POST","/api/staff/orders/:id/send","staff"),y("payOrder","POST","/api/staff/orders/:id/pay","staff"),y("cancelOrder","POST","/api/staff/orders/:id/cancel","staff"),y("advanceLines","POST","/api/staff/orders/:id/advance","staff"),y("createItem","POST","/api/staff/items","staff"),y("updateItem","PUT","/api/staff/items/:id","staff"),y("setItemAvailability","PATCH","/api/staff/items/:id","staff"),y("deleteItem","DELETE","/api/staff/items/:id","staff"),y("createTable","POST","/api/staff/tables","staff"),y("deleteTable","DELETE","/api/staff/tables/:id","staff"),y("updateReservation","PATCH","/api/staff/reservations/:id","staff"),y("updateSettings","PUT","/api/staff/settings","staff"),y("resetDemo","POST","/api/staff/demo/reset","staff"),y("clearOrders","POST","/api/staff/demo/clear","staff")],ct=Object.fromEntries(hs.map(t=>[t.name,t]));var bs=2500;async function Ge(){try{let t=await fetch(ct.bootstrap.path,{signal:AbortSignal.timeout(bs)});return t.ok&&(t.headers.get("content-type")??"").includes("application/json")}catch{return!1}}function $s(t,e){let a={...e};return{url:t.replace(/:(\w+)/g,(i,r)=>{let n=a[r];return delete a[r],encodeURIComponent(n)}),rest:a}}function Ye(){async function t(a,s={}){let i=ct[a],{url:r,rest:n}=$s(i.path,s),c=i.method==="GET",l=c&&Object.keys(n).length?`?${new URLSearchParams(n)}`:"",p;try{p=await fetch(r+l,{method:i.method,credentials:"same-origin",headers:c?{}:{"Content-Type":"application/json"},body:c?void 0:JSON.stringify(n)})}catch{throw new D(0,"ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید.")}let u=await p.json().catch(()=>({}));if(!p.ok)throw new D(p.status,u.error??"خطا در ارتباط با سرور.");return u}function e(a){let s=new EventSource(ct.events.path);return s.addEventListener("change",a),()=>s.close()}return{mode:"server",call:t,subscribe:e}}var Ct="cafe-ghahve.demo-db.v2",Ve="cafe-ghahve.demo-session",vs=4;function Ke(){let t=P.get(Ct),e=t?qe(t):{...At(),pin:ke},a=Jt.get(Ve)===!0,s=()=>P.set(Ct,e),i=p=>{a=p,Jt.set(Ve,p)},r={login({pin:p}){if(String(p??"")!==e.pin)throw new D(401,"رمز درست نیست.");return i(!0),{ok:!0}},logout(){return i(!1),{ok:!0}},changePin({pin:p}){let u=String(p??"").trim();if(u.length<vs)throw new D(400,"رمز باید دست‌کم ۴ رقم باشد.");return e.pin=u,{ok:!0}}};function n(p,u){return p.access==="staff"?{result:u,state:Wt.staffState(e)}:p.name==="bootstrap"?{...u,pinHint:e.pin}:u}async function c(p,u={}){let m=ct[p];if(m.access==="staff"&&!a)throw new D(401,"برای این کار باید وارد شوید.");let b=(r[p]??(g=>Wt[p](e,g)))(structuredClone(u));return m.method!=="GET"&&s(),structuredClone(n(m,b))}function l(p){let u=m=>{m.key===Ct&&(e=P.get(Ct)??e,p())};return window.addEventListener("storage",u),()=>window.removeEventListener("storage",u)}return{mode:"demo",call:c,subscribe:l}}var qt=null,ae=0;async function Qe(){qt=!(window.CAFE_DEMO===!0||location.protocol==="file:")&&await Ge()?Ye():Ke()}var M={get mode(){return qt.mode},call:(t,e)=>qt.call(t,e),subscribe:t=>qt.subscribe(t)};async function se(){o.db={...Ft(),...await M.call("bootstrap")}}async function F(t,e){ae=Date.now();let{result:a,state:s}=await M.call(t,e);return ae=Date.now(),o.db={...Ft(),...s,pinHint:o.db.pinHint},a}var We=()=>Date.now()-ae;var ie=0,H=(t,e,a,s,i=.16)=>`<ellipse cx="${t}" cy="${e}" rx="${a}" ry="${s}" fill="#000" opacity="${i}"/>`,ys=(t=118,e="#faf8f1")=>H(208,164,t+6,t-2)+`<circle cx="200" cy="150" r="${t}" fill="${e}"/><circle cx="200" cy="150" r="${t-26}" fill="none" stroke="#000" stroke-opacity=".07" stroke-width="2"/>`,w=(t,e,a,s=60)=>{let i=st(t),r="";for(let n=0;n<e;n++){let c=i()*6.283,l=Math.sqrt(i())*s;r+=a(200+Math.cos(c)*l,150+Math.sin(c)*l,i,n)}return r},gs={cup(t){let{liq:e="#3b2212",art:a="crema",cupc:s="#fffdf7",saucer:i="#ece5d6",garnish:r}=t,n=H(210,166,122,112)+`<circle cx="200" cy="150" r="114" fill="${i}"/><circle cx="200" cy="150" r="97" fill="none" stroke="#000" stroke-opacity=".07" stroke-width="2"/><g transform="rotate(42 108 226)"><rect x="105" y="150" width="6" height="66" rx="3" fill="#b8975a"/><ellipse cx="108" cy="226" rx="10" ry="15" fill="#c9a865"/></g><rect x="262" y="136" width="58" height="28" rx="14" fill="${s}" transform="rotate(-32 200 150)"/><circle cx="200" cy="150" r="80" fill="${s}"/><circle cx="200" cy="150" r="80" fill="none" stroke="#000" stroke-opacity=".09" stroke-width="2"/><circle cx="200" cy="150" r="68" fill="${e}"/>`;if(a==="crema"&&(n+='<circle cx="200" cy="150" r="60" fill="#b8793a" opacity=".6"/><circle cx="192" cy="144" r="36" fill="#dba762" opacity=".5"/><circle cx="186" cy="140" r="14" fill="#f0c98a" opacity=".5"/>'),a==="heart"&&(n+='<path d="M200 192c-30-20-45-37-45-55a22.5 22.5 0 0 1 45-9a22.5 22.5 0 0 1 45 9c0 18-15 35-45 55z" fill="#fff6e6"/>'),a==="rosetta"){for(let c=0;c<5;c++){let l=186-c*17,p=40-c*6;n+=`<path d="M${200-p} ${l-16}Q200 ${l+12} ${200+p} ${l-16}" fill="none" stroke="#fff6e6" stroke-width="9" stroke-linecap="round"/>`}n+=`<path d="M200 198V100" stroke="${e}" stroke-width="3"/>`}return a==="foam"&&(n+='<circle cx="200" cy="150" r="60" fill="#f4e6cd"/>'+w(7,46,(c,l,p)=>`<circle cx="${c.toFixed(1)}" cy="${l.toFixed(1)}" r="${(1+p()*1.6).toFixed(1)}" fill="${t.dust||"#6b3d1e"}" opacity=".75"/>`,44)),r==="saffron"&&(n+=w(11,9,(c,l,p)=>`<path d="M${c.toFixed(0)} ${l.toFixed(0)}l${(p()*14-7).toFixed(0)} ${(p()*14-7).toFixed(0)}" stroke="#b3261e" stroke-width="2.4" stroke-linecap="round"/>`,30)),r==="lemon"&&(n+='<circle cx="222" cy="136" r="26" fill="#f4d35e"/><circle cx="222" cy="136" r="20" fill="#f9e79a"/>'+[0,60,120].map(c=>`<path d="M202 136h40" stroke="#f4d35e" stroke-width="2.5" transform="rotate(${c} 222 136)"/>`).join("")+'<ellipse cx="172" cy="170" rx="14" ry="7" fill="#6f9a4b" transform="rotate(-30 172 170)"/>'),r==="rose"&&(n+=w(5,9,(c,l,p)=>`<ellipse cx="${c.toFixed(0)}" cy="${l.toFixed(0)}" rx="9" ry="6" fill="#d9788f" opacity=".9" transform="rotate(${(p()*180).toFixed(0)} ${c.toFixed(0)} ${l.toFixed(0)})"/>`,44)),r==="pods"&&(n+=w(9,4,(c,l,p)=>`<ellipse cx="${c.toFixed(0)}" cy="${l.toFixed(0)}" rx="10" ry="5" fill="#8aa35a" transform="rotate(${(p()*180).toFixed(0)} ${c.toFixed(0)} ${l.toFixed(0)})"/>`,36)),r==="anise"&&(n+=[0,45,90,135].map(c=>`<ellipse cx="200" cy="150" rx="22" ry="5" fill="#5c3320" transform="rotate(${c} 200 150)"/>`).join("")+'<circle cx="200" cy="150" r="4" fill="#3a1f12"/>'),n+'<path d="M146 118a62 62 0 0 1 46-30" stroke="#fff" stroke-opacity=".3" stroke-width="5" fill="none" stroke-linecap="round"/>'},glass(t){let{layers:e,ice:a,foam:s,straw:i,garnish:r,short:n}=t,c="c"+ie++,l=n?128:58,p=246,u=`M140 ${l}L260 ${l}L246 ${p-8}Q200 ${p+6} 154 ${p-8}Z`,m=H(200,252,86,12,.22)+`<clipPath id="${c}"><path d="${u}"/></clipPath><path d="${u}" fill="#fff" opacity=".22"/>`;i&&(m+=`<rect x="214" y="${l-46}" width="8" height="${p-l+20}" rx="4" fill="#c9a45c" transform="rotate(10 218 ${p})"/>`),m+=`<g clip-path="url(#${c})">`;let h=p+8,b=p+8-(l+20);if(e.forEach(([g,k])=>{let Z=b*k;h-=Z,m+=`<rect x="130" y="${h.toFixed(1)}" width="140" height="${(Z+1).toFixed(1)}" fill="${g}"/>`}),s&&(m+=`<rect x="130" y="${(h-12).toFixed(1)}" width="140" height="14" fill="${s}"/>`),a){let g=st(a);for(let k=0;k<6;k++){let Z=150+g()*70,xt=l+30+g()*(n?50:110);m+=`<rect x="${Z.toFixed(0)}" y="${xt.toFixed(0)}" width="30" height="30" rx="5" fill="#fff" opacity=".3" transform="rotate(${(g()*60-30).toFixed(0)} ${Z.toFixed(0)} ${xt.toFixed(0)})"/>`}}return m+=`</g><path d="${u}" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><path d="M153 ${l+16}L161 ${p-26}" stroke="#fff" stroke-opacity=".5" stroke-width="5" stroke-linecap="round"/>`,r==="mint"&&(m+=`<ellipse cx="176" cy="${l-4}" rx="18" ry="9" fill="#4f9a55" transform="rotate(-28 176 ${l})"/><ellipse cx="198" cy="${l-8}" rx="16" ry="8" fill="#63b168" transform="rotate(24 198 ${l})"/>`),r==="orange"&&(m+=`<circle cx="258" cy="${l+2}" r="26" fill="#e8892f"/><circle cx="258" cy="${l+2}" r="20" fill="#f6b45a"/>`+[0,60,120].map(g=>`<path d="M238 ${l+2}h40" stroke="#e8892f" stroke-width="2.5" transform="rotate(${g} 258 ${l+2})"/>`).join("")),r==="scoop"&&(m+=`<circle cx="200" cy="${l+4}" r="42" fill="#f7ecd2"/><circle cx="186" cy="${l-10}" r="12" fill="#fff" opacity=".5"/><path d="M168 ${l+16}q32 26 64 0q-4 40-32 50q-28-10-32-50z" fill="#3b2212" opacity=".85"/>`),m},brew(t){let e="c"+ie++,a="#4a2815";if(t.kind==="chemex"){let i="M158 52L242 52L214 140L258 238Q200 252 142 238L186 140Z";return H(200,250,90,12,.22)+`<clipPath id="${e}"><path d="${i}"/></clipPath><path d="${i}" fill="#fff" opacity=".22"/><g clip-path="url(#${e})"><rect x="130" y="186" width="140" height="70" fill="${a}"/><path d="M165 56L235 56L205 136H195Z" fill="#f3ead8"/><path d="M175 60h50l-8 18h-34z" fill="#3b2212"/></g><path d="${i}" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><rect x="178" y="124" width="44" height="30" rx="4" fill="#a8743a"/><path d="M200 124v30" stroke="#6e4a22" stroke-width="2"/><circle cx="200" cy="139" r="5" fill="#d9c29a"/>`}if(t.kind==="aeropress")return H(200,252,84,12,.22)+`<rect x="146" y="188" width="108" height="58" rx="10" fill="#fffdf7"/><path d="M254 200h14a14 14 0 0 1 0 30h-14" fill="none" stroke="#fffdf7" stroke-width="9"/><rect x="156" y="178" width="88" height="14" rx="3" fill="#2a2a2a"/><rect x="166" y="78" width="68" height="102" rx="4" fill="#fff" opacity=".28"/><rect x="166" y="120" width="68" height="60" fill="${a}" opacity=".9"/><rect x="166" y="78" width="68" height="102" rx="4" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><rect x="174" y="34" width="52" height="88" rx="4" fill="#3a3a3a"/><rect x="160" y="28" width="80" height="12" rx="4" fill="#2a2a2a"/>`;if(t.kind==="siphon")return H(200,256,80,10,.22)+`<path d="M270 40V250M236 250h68" stroke="#b8975a" stroke-width="7" stroke-linecap="round"/><path d="M270 96h-30M270 176h-22" stroke="#b8975a" stroke-width="6"/><circle cx="200" cy="92" r="46" fill="#fff" opacity=".24"/><path d="M158 92a42 42 0 0 0 84 0z" fill="${a}"/><circle cx="200" cy="92" r="46" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><rect x="194" y="136" width="12" height="20" fill="#fff" opacity=".5"/><circle cx="200" cy="196" r="46" fill="#fff" opacity=".24"/><circle cx="200" cy="196" r="46" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><path d="M190 256q10-22 10-10q0-12 10 10z" fill="#e8892f"/><rect x="182" y="254" width="36" height="8" rx="3" fill="#2a2a2a"/>`;let s="M150 172L250 172L262 244Q200 256 138 244Z";return H(200,254,92,12,.22)+`<clipPath id="${e}"><path d="${s}"/></clipPath><path d="${s}" fill="#fff" opacity=".22"/><g clip-path="url(#${e})"><rect x="130" y="208" width="140" height="50" fill="${a}"/></g><path d="${s}" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><rect x="140" y="160" width="120" height="12" rx="6" fill="#fffdf7"/><path d="M130 86L270 86L224 160H176Z" fill="#fffdf7"/><path d="M142 92h116l-8 12h-100z" fill="#3b2212"/><path d="M170 100l14 54M200 100v54M230 100l-14 54" stroke="#000" stroke-opacity=".08" stroke-width="3"/><path d="M270 96q28 4 22 30q-6 16-30 14" fill="none" stroke="#fffdf7" stroke-width="9" stroke-linecap="round"/><path d="M200 176v20" stroke="${a}" stroke-width="3" stroke-linecap="round"/>`},plate(t){let e=ys(118,t.plate||"#faf8f1"),a=t.kind;if(a==="avotoast"&&(e+='<rect x="132" y="96" width="136" height="108" rx="22" fill="#b98042" transform="rotate(-8 200 150)"/><rect x="140" y="104" width="120" height="92" rx="16" fill="#dfb878" transform="rotate(-8 200 150)"/>'+[0,1,2,3,4].map(s=>`<ellipse cx="${160+s*15}" cy="${170-s*6}" rx="9" ry="30" fill="${s%2?"#a9c66a":"#8db255"}" transform="rotate(${-34+s*5} ${160+s*15} ${170-s*6})"/>`).join("")+'<path d="M196 110q34-14 46 14q8 30-22 36q-34 2-36-24q-2-16 12-26z" fill="#fffdf8"/><circle cx="214" cy="134" r="14" fill="#f2a52b"/><circle cx="209" cy="129" r="4" fill="#fff" opacity=".6"/>'+w(3,14,(s,i)=>`<circle cx="${s.toFixed(0)}" cy="${i.toFixed(0)}" r="1.8" fill="#b3261e"/>`,54)),a==="omelette"&&(e+='<path d="M118 150a82 62 0 0 1 164 0q-6 18-82 20q-76-2-82-20z" fill="#f4c542"/><path d="M118 150q82 -34 164 0" fill="none" stroke="#e0a92a" stroke-width="4"/><path d="M130 158q70 14 140 0" fill="none" stroke="#fbe08a" stroke-width="5" stroke-linecap="round"/>'+w(4,8,(s,i,r)=>`<ellipse cx="${s.toFixed(0)}" cy="${(i-22).toFixed(0)}" rx="12" ry="8" fill="#2c221c" transform="rotate(${(r()*180).toFixed(0)} ${s.toFixed(0)} ${(i-22).toFixed(0)})"/><ellipse cx="${s.toFixed(0)}" cy="${(i-22).toFixed(0)}" rx="7" ry="4" fill="#6b5645" transform="rotate(${(r()*180).toFixed(0)} ${s.toFixed(0)} ${(i-22).toFixed(0)})"/>`,46)+w(6,16,(s,i,r)=>`<path d="M${s.toFixed(0)} ${i.toFixed(0)}l${(r()*10-5).toFixed(0)} ${(r()*10-5).toFixed(0)}" stroke="#5f9a4a" stroke-width="2.5" stroke-linecap="round"/>`,70)),a==="pancake"&&(e+='<circle cx="206" cy="158" r="66" fill="#c98b3f"/><circle cx="200" cy="152" r="66" fill="#e3ab5c"/><circle cx="204" cy="150" r="62" fill="#c98b3f"/><circle cx="198" cy="144" r="62" fill="#f0c27a"/><path d="M150 140q20 40 50 20t56 16q-8 30-54 34q-48-6-52-70z" fill="#a8581f" opacity=".75"/><rect x="186" y="124" width="26" height="24" rx="4" fill="#fbe9a8" transform="rotate(14 199 136)"/>'+w(8,7,(s,i,r,n)=>`<circle cx="${s.toFixed(0)}" cy="${i.toFixed(0)}" r="${n%2?7:9}" fill="${n%2?"#35406e":"#c0283d"}"/><circle cx="${(s-2).toFixed(0)}" cy="${(i-2).toFixed(0)}" r="2" fill="#fff" opacity=".5"/>`,52)+'<circle cx="100" cy="150" r="1" fill="none"/>'),a==="croissant"){for(let s=0;s<7;s++){let i=-150+s*20,r=i*Math.PI/180,n=200+Math.cos(r)*52,c=178+Math.sin(r)*52,l=30-Math.abs(3-s)*5;e+=`<ellipse cx="${n.toFixed(0)}" cy="${c.toFixed(0)}" rx="${l}" ry="${(l*.62).toFixed(0)}" fill="${s%2?"#d99a45":"#c98432"}" transform="rotate(${i+90} ${n.toFixed(0)} ${c.toFixed(0)})"/><ellipse cx="${n.toFixed(0)}" cy="${(c-3).toFixed(0)}" rx="${(l*.6).toFixed(0)}" ry="${(l*.22).toFixed(0)}" fill="#f1c886" opacity=".7" transform="rotate(${i+90} ${n.toFixed(0)} ${c.toFixed(0)})"/>`}e+='<circle cx="252" cy="196" r="20" fill="#fffdf7"/><circle cx="252" cy="196" r="14" fill="#b3263b"/>'}if(a==="persian"&&(e+='<path d="M112 120l70-34l14 70l-66 22z" fill="#e8cf9b"/><path d="M124 122l52-24l10 50l-50 16z" fill="#f3e2b8"/>'+w(2,6,(s,i)=>`<circle cx="${s.toFixed(0)}" cy="${i.toFixed(0)}" r="1.6" fill="#4a3a22"/>`,14).replace(/cx="(\d+)"/g,(s,i)=>`cx="${+i-48}"`)+'<rect x="206" y="88" width="34" height="30" rx="3" fill="#fffdf8"/><rect x="234" y="100" width="30" height="28" rx="3" fill="#f4f1e8"/>'+[0,1,2,3].map(s=>`<circle cx="${218+s*17}" cy="${164+s%2*8}" r="15" fill="#7fb069"/><circle cx="${218+s*17}" cy="${164+s%2*8}" r="10" fill="#c5e0a5"/>`).join("")+[0,1,2].map(s=>`<circle cx="${148+s*22}" cy="${196-s*4}" r="15" fill="#d6432f"/><circle cx="${148+s*22}" cy="${196-s*4}" r="8" fill="#ee8a6a"/>`).join("")+'<ellipse cx="212" cy="214" rx="16" ry="12" fill="#8a5a2b"/><ellipse cx="236" cy="208" rx="14" ry="11" fill="#9a6a38"/><circle cx="170" cy="150" r="5" fill="#3d5a2a"/><circle cx="182" cy="160" r="5" fill="#2e2a3a"/>'),a==="pasta"){let s=st(12);for(let i=0;i<16;i++)e+=`<ellipse cx="${(200+s()*16-8).toFixed(0)}" cy="${(150+s()*16-8).toFixed(0)}" rx="${(34+s()*30).toFixed(0)}" ry="${(18+s()*26).toFixed(0)}" fill="none" stroke="${i%3?"#ecd28f":"#d9b866"}" stroke-width="7" transform="rotate(${(s()*180).toFixed(0)} 200 150)"/>`;e+=w(13,6,(i,r,n)=>`<path d="M${(i-12).toFixed(0)} ${r.toFixed(0)}a12 9 0 0 1 24 0z" fill="#8a6a4e"/><rect x="${(i-3).toFixed(0)}" y="${r.toFixed(0)}" width="6" height="9" rx="2" fill="#d8c4a4"/>`,50)+w(14,7,(i,r,n)=>`<ellipse cx="${i.toFixed(0)}" cy="${r.toFixed(0)}" rx="9" ry="6" fill="#2c221c" transform="rotate(${(n()*180).toFixed(0)} ${i.toFixed(0)} ${r.toFixed(0)})"/>`,40)+w(15,26,(i,r)=>`<rect x="${i.toFixed(0)}" y="${r.toFixed(0)}" width="5" height="2" fill="#fffbe8"/>`,60)}return a==="salad"&&(e+=w(21,34,(s,i,r,n)=>`<ellipse cx="${s.toFixed(0)}" cy="${i.toFixed(0)}" rx="${(16+r()*12).toFixed(0)}" ry="${(9+r()*6).toFixed(0)}" fill="${["#5b9647","#7fb35a","#3f7a39","#a3cc6f"][n%4]}" transform="rotate(${(r()*180).toFixed(0)} ${s.toFixed(0)} ${i.toFixed(0)})"/>`,66)+[0,1,2,3].map(s=>`<rect x="${158+s*22}" y="${132+s*3}" width="17" height="46" rx="7" fill="#e3b77c" transform="rotate(-18 ${166+s*22} 155)"/><path d="M${161+s*22} ${146+s*3}h11M${161+s*22} ${160+s*3}h11" stroke="#8a5a2b" stroke-width="2.5" transform="rotate(-18 ${166+s*22} 155)"/>`).join("")+w(22,7,(s,i,r)=>`<rect x="${s.toFixed(0)}" y="${i.toFixed(0)}" width="12" height="12" rx="2" fill="#d9a55a" transform="rotate(${(r()*90).toFixed(0)} ${s.toFixed(0)} ${i.toFixed(0)})"/>`,64)+w(23,9,(s,i,r)=>`<path d="M${s.toFixed(0)} ${i.toFixed(0)}l14 4l-10 6z" fill="#fff8dc"/>`,60)),a==="risotto"&&(e+='<circle cx="200" cy="150" r="76" fill="#e9b93a"/><circle cx="200" cy="150" r="76" fill="none" stroke="#d49f22" stroke-width="3"/>'+w(31,150,(s,i,r)=>`<ellipse cx="${s.toFixed(0)}" cy="${i.toFixed(0)}" rx="4" ry="2" fill="#f7dc86" transform="rotate(${(r()*180).toFixed(0)} ${s.toFixed(0)} ${i.toFixed(0)})"/>`,70)+w(32,12,(s,i,r)=>`<path d="M${s.toFixed(0)} ${i.toFixed(0)}l${(r()*16-8).toFixed(0)} ${(r()*16-8).toFixed(0)}" stroke="#b3261e" stroke-width="2.4" stroke-linecap="round"/>`,40)+w(33,10,(s,i)=>`<circle cx="${s.toFixed(0)}" cy="${i.toFixed(0)}" r="3" fill="#4f8a3c"/>`,60)+'<path d="M170 128l34 8l-26 12z" fill="#fff8dc"/>'),a==="steak"&&(e+='<path d="M130 150q0-54 62-50q56 4 56 50q0 44-58 46q-60 0-60-46z" fill="#5a2e22"/><path d="M138 150q0-44 54-42q48 4 48 42q0 36-50 38q-52 0-52-38z" fill="#7a3f2c"/>'+[0,1,2,3].map(s=>`<path d="M${152+s*22} 118l-12 62" stroke="#2c1711" stroke-width="5" stroke-linecap="round"/>`).join("")+[0,1,2,3].map(s=>`<path d="M256 ${104+s*11}q24 34 6 86" fill="none" stroke="${s%2?"#5b9647":"#6fa955"}" stroke-width="7" stroke-linecap="round" transform="translate(${s*9} 0)"/>`).join("")+'<circle cx="150" cy="212" r="20" fill="#3b1d16"/><circle cx="146" cy="208" r="6" fill="#fff" opacity=".25"/><rect x="178" y="134" width="22" height="16" rx="3" fill="#fbe9a8"/>'),a==="tart"&&(e+='<circle cx="200" cy="150" r="80" fill="#c98b3f"/>'+Array.from({length:18},(s,i)=>{let r=i*20*Math.PI/180;return`<circle cx="${(200+Math.cos(r)*78).toFixed(0)}" cy="${(150+Math.sin(r)*78).toFixed(0)}" r="9" fill="#d9a55a"/>`}).join("")+'<circle cx="200" cy="150" r="68" fill="#a9c27a"/>'+w(41,60,(s,i)=>`<rect x="${s.toFixed(0)}" y="${i.toFixed(0)}" width="4" height="3" fill="#6f8f45"/>`,62)+Array.from({length:7},(s,i)=>{let r=i*51.4*Math.PI/180,n=200+Math.cos(r)*40,c=150+Math.sin(r)*40;return`<circle cx="${n.toFixed(0)}" cy="${c.toFixed(0)}" r="14" fill="#c0283d"/><circle cx="${n.toFixed(0)}" cy="${c.toFixed(0)}" r="5" fill="#7d1426"/><circle cx="${(n-5).toFixed(0)}" cy="${(c-5).toFixed(0)}" r="3" fill="#fff" opacity=".4"/>`}).join("")+'<circle cx="200" cy="150" r="14" fill="#c0283d"/><circle cx="200" cy="150" r="5" fill="#7d1426"/>'),a==="cookie"&&(e+='<circle cx="200" cy="150" r="74" fill="#b9793a"/><circle cx="196" cy="146" r="70" fill="#cf9550"/>'+w(51,12,(s,i,r)=>`<rect x="${s.toFixed(0)}" y="${i.toFixed(0)}" width="${(14+r()*8).toFixed(0)}" height="${(12+r()*6).toFixed(0)}" rx="4" fill="#3b2212" transform="rotate(${(r()*90).toFixed(0)} ${s.toFixed(0)} ${i.toFixed(0)})"/>`,52)+w(52,16,(s,i)=>`<rect x="${s.toFixed(0)}" y="${i.toFixed(0)}" width="4" height="4" fill="#fff" opacity=".9"/>`,58)),e},slice(t){let e="c"+ie++,{layers:a,topc:s,garnish:i}=t,n=H(208,236,130,20,.2)+`<ellipse cx="204" cy="224" rx="140" ry="34" fill="#faf8f1"/><ellipse cx="204" cy="222" rx="112" ry="24" fill="none" stroke="#000" stroke-opacity=".07" stroke-width="2"/><clipPath id="${e}"><path d="M126 128L292 152L292 222L126 216Z"/></clipPath><g clip-path="url(#${e})">`,c=226;return a.forEach(([l,p])=>{c-=p,n+=`<rect x="120" y="${c}" width="180" height="${p+1}" fill="${l}" transform="skewY(4) translate(0 -12)"/>`}),n+=`</g><path d="M126 128L292 152L304 134L172 106Z" fill="${s}"/><path d="M292 152L304 134V200L292 222Z" fill="#000" opacity=".18"/>`,i==="cocoa"&&(n+=w(61,50,(l,p)=>`<circle cx="${(l*.9+34).toFixed(0)}" cy="${(p*.2+100).toFixed(0)}" r="1.6" fill="#2a160c"/>`,60)),i==="berry"&&(n+='<circle cx="224" cy="124" r="12" fill="#c0283d"/><circle cx="220" cy="120" r="3" fill="#fff" opacity=".5"/><ellipse cx="244" cy="130" rx="10" ry="5" fill="#5b9647" transform="rotate(20 244 130)"/>'),i==="walnut"&&(n+='<ellipse cx="220" cy="124" rx="15" ry="10" fill="#8a5a2b"/><path d="M207 124q13-8 26 0" stroke="#5e3b18" stroke-width="2" fill="none"/><circle cx="184" cy="120" r="6" fill="#e8892f"/>'),i==="burnt"&&(n+='<path d="M150 118q50 6 120 22" stroke="#000" stroke-opacity=".25" stroke-width="10" stroke-linecap="round" fill="none"/>'),n+'<g transform="rotate(-10 96 236)"><rect x="60" y="232" width="62" height="5" rx="2" fill="#b8975a"/><path d="M36 228h26v12H36z" fill="#c9a865"/></g>'},sandwich(t){let{bread:e="#c98b3f",crumb:a="#f0d9a8",fill:s=[],top:i="flat"}=t,r=H(204,240,136,18,.2)+`<rect x="60" y="226" width="288" height="16" rx="8" fill="#8a5a2b"/><rect x="60" y="224" width="288" height="8" rx="4" fill="#a8743a"/><rect x="104" y="196" width="192" height="30" rx="10" fill="${e}"/><rect x="110" y="196" width="180" height="12" rx="4" fill="${a}"/>`,n=196;return s.forEach(([c,l,p])=>{if(n-=l,p==="wave"){let u=`M96 ${n+l}`;for(let m=0;m<9;m++)u+=`q12-${l+8} 23 0`;r+=`<path d="${u}V${n+l+4}H96z" fill="${c}"/>`}else p==="rounds"?r+=[0,1,2,3].map(u=>`<rect x="${108+u*46}" y="${n}" width="42" height="${l}" rx="${l/2}" fill="${c}"/>`).join(""):r+=`<rect x="${p==="drip"?98:106}" y="${n}" width="${p==="drip"?204:188}" height="${l}" rx="4" fill="${c}"/>`+(p==="drip"?`<path d="M112 ${n+l}v12M250 ${n+l}v16M176 ${n+l}v8" stroke="${c}" stroke-width="10" stroke-linecap="round"/>`:"")}),i==="croissant"?r+=`<path d="M96 ${n}q10-64 104-64t104 64z" fill="${e}"/>`+[0,1,2,3,4].map(c=>`<path d="M${128+c*34} ${n-4}q6-36 22-52" stroke="#f1c886" stroke-opacity=".6" stroke-width="7" fill="none" stroke-linecap="round"/>`).join(""):i==="grill"?r+=`<rect x="104" y="${n-30}" width="192" height="30" rx="10" fill="${e}"/>`+[0,1,2,3,4,5].map(c=>`<path d="M${124+c*30} ${n-26}l12 20" stroke="#5e3b18" stroke-width="5" stroke-linecap="round"/>`).join(""):r+=`<path d="M104 ${n}v-18q0-22 96-22t96 22v18z" fill="${e}"/><path d="M130 ${n-28}q70-14 140 0" stroke="#fff" stroke-opacity=".25" stroke-width="5" fill="none" stroke-linecap="round"/>`+w(71,12,(c,l)=>`<ellipse cx="${c.toFixed(0)}" cy="${(n-30+(l-150)*.12).toFixed(0)}" rx="3" ry="1.6" fill="#fbe9a8"/>`,80),r+`<path d="M200 ${n-74}v70" stroke="#b8975a" stroke-width="3"/><circle cx="200" cy="${n-76}" r="7" fill="#6e2433"/>`}},xs='<g fill="none" stroke="#d4af6a" stroke-opacity=".2"><circle cx="400" cy="0" r="110"/><circle cx="400" cy="0" r="150"/><circle cx="400" cy="0" r="190"/><circle cx="0" cy="300" r="90"/><circle cx="0" cy="300" r="130"/></g>';function ws(t){let[e,a,s]=t.art??["cup",{},"#16120b"];return`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${d(t.name)}"><rect width="400" height="300" fill="${s}"/>${xs}${gs[e](a??{})}</svg>`}function q(t,e=""){let a=t.img?`<img src="${d(t.img)}" alt="" loading="lazy" decoding="async">`:"";return`<span class="pic ${e}">${ws(t)}${a}</span>`}function Ze(){document.addEventListener("error",t=>{let e=t.target;e instanceof HTMLImageElement&&e.closest(".pic")&&e.remove()},!0)}var Xe={draft:["ارسال‌نشده",""],queued:["در صف","info"],cooking:["در حال آماده‌سازی","warn"],ready:["آماده تحویل","ok"],served:["سرو شده",""],paid:["تسویه شده","ok"],cancelled:["لغو شده","bad"]},Dt={free:["آزاد","ok"],busy:["مشغول","bad"],bill:["منتظر تسویه","warn"],res:["رزرو امروز","info"]},Je={pending:["در انتظار تأیید","warn"],confirmed:["تأیید شده","ok"],cancelled:["لغو شده","bad"]},ta={card:"کارت‌خوان",cash:"نقدی"},ea=t=>Xe[t][0],yt=([t,e])=>`<span class="pill ${e}">${t}</span>`,at=t=>yt(Xe[t]);var ne=[];function sa(){if(ne.forEach(e=>e()),ne=[],Xt())return;let t=v(".hero");t&&ne.push(ks(v(".dust",t),t),Ss(v(".shot",t)),Ts(t),Os(_e("[data-count]")))}var U={perPixel:1/14e3,max:90,minRadius:.6,maxRadius:2.2,minSpeed:6,maxSpeed:22,drift:8};function aa(t,e,a){return{x:Math.random()*t,y:a?e+4:Math.random()*e,radius:U.minRadius+Math.random()*(U.maxRadius-U.minRadius),speed:U.minSpeed+Math.random()*(U.maxSpeed-U.minSpeed),phase:Math.random()*Math.PI*2}}function ks(t,e){let a=t.getContext("2d"),s=0,i=0,r=[],n=0,c=0,l=!0;function p(){let b=Math.min(devicePixelRatio||1,2);({width:s,height:i}=e.getBoundingClientRect()),t.width=s*b,t.height=i*b,a.setTransform(b,0,0,b,0,0);let g=Math.min(U.max,Math.round(s*i*U.perPixel));r=Array.from({length:g},()=>aa(s,i,!1))}function u(b){let g=Math.min((b-c)/1e3,.05);c=b,a.clearRect(0,0,s,i),r.forEach((k,Z)=>{k.y-=k.speed*g,k.x+=Math.sin(b/1400+k.phase)*U.drift*g,k.y<-4&&(r[Z]=aa(s,i,!0));let xt=.35+.65*Math.abs(Math.sin(b/900+k.phase));a.fillStyle=`rgba(246, 227, 168, ${(xt*.7).toFixed(3)})`,a.beginPath(),a.arc(k.x,k.y,k.radius,0,Math.PI*2),a.fill()}),l&&(n=requestAnimationFrame(u))}let m=new IntersectionObserver(([b])=>{let g=l;l=b.isIntersecting,l&&!g&&(n=requestAnimationFrame(u))}),h=new ResizeObserver(p);return p(),m.observe(e),h.observe(e),n=requestAnimationFrame(u),()=>{cancelAnimationFrame(n),m.disconnect(),h.disconnect()}}var lt={seconds:28,grams:36,holdSeconds:5,tick:100};function Ss(t){if(!t)return()=>{};let e=v('[data-shot="seconds"]',t),a=v('[data-shot="grams"]',t),s=v(".bar i",t),i=performance.now();function r(){let c=(performance.now()-i)/1e3%(lt.seconds+lt.holdSeconds),l=Math.min(c/lt.seconds,1);e.textContent=(l*lt.seconds).toLocaleString("fa-IR",{minimumFractionDigits:1,maximumFractionDigits:1}),a.textContent=f(Math.round(l*lt.grams)),s.style.transform=`scaleX(${l})`}let n=setInterval(r,lt.tick);return()=>clearInterval(n)}function Ts(t){let e=a=>{let s=t.getBoundingClientRect();t.style.setProperty("--mx",`${((a.clientX-s.left)/s.width*100).toFixed(1)}%`),t.style.setProperty("--my",`${((a.clientY-s.top)/s.height*100).toFixed(1)}%`)};return t.addEventListener("pointermove",e),()=>t.removeEventListener("pointermove",e)}var Es=1400,As=t=>1-(1-t)**3;function Os(t){let e=new IntersectionObserver(a=>{a.filter(s=>s.isIntersecting).forEach(({target:s})=>{e.unobserve(s);let i=Number(s.dataset.count),r=performance.now(),n=c=>{let l=Math.min((c-r)/Es,1);s.textContent=f(Math.round(i*As(l))),l<1&&requestAnimationFrame(n)};requestAnimationFrame(n)})},{threshold:.6});return t.forEach(a=>e.observe(a)),()=>e.disconnect()}var Is=650,Ms=90;function Pt(t){t&&(t.classList.remove("bump"),t.offsetWidth,t.classList.add("bump"))}function ia(t){let e=v(".cartbtn");if(!t||!e||Xt())return Pt(e);let a=t.getBoundingClientRect(),s=e.getBoundingClientRect(),i=a.left+a.width/2,r=a.top+a.height/2,n=s.left+s.width/2-i,c=s.top+s.height/2-r,l=Object.assign(document.createElement("span"),{className:"fly-dot"});l.style.left=`${i}px`,l.style.top=`${r}px`,document.body.appendChild(l);let p=l.animate([{transform:"translate(0, 0) scale(1)",opacity:1},{transform:`translate(${n/2}px, ${c/2-Ms}px) scale(1.25)`,opacity:1,offset:.5},{transform:`translate(${n}px, ${c}px) scale(.3)`,opacity:.3}],{duration:Is,easing:"cubic-bezier(.3, .6, .4, 1)"});p.onfinish=()=>{l.remove(),Pt(e)}}var Fs=2600,Rs=3500,Ls=180,ra={},oa={},ca={},la={},oe=()=>{},A=t=>Object.assign(ra,t),da=t=>Object.assign(oa,t),dt=t=>Object.assign(ca,t),Q=t=>Object.assign(la,t),pa=t=>{oe=t},fa=()=>v("#layer"),na;function R(t){let e=v("#toast");e.innerHTML=`<div>${d(t)}</div>`,clearTimeout(na),na=setTimeout(()=>{e.innerHTML=""},Fs)}function ce(t,e){fa().innerHTML=t,o.ui.layer=e}function W(t,e,{wide:a=!1,kind:s="modal"}={}){ce(`<div class="scrim center" data-a="close-layer">
+    <div class="modal ${a?"wide":""}" role="dialog" aria-modal="true" aria-label="${d(t)}">
+      <header><h3>${d(t)}</h3><button class="x" data-a="close-layer" aria-label="بستن">×</button></header>
+      <div class="mbody">${e}</div>
+    </div></div>`,s)}function K({animate:t=!1}={}){let e=fa(),a=e.firstElementChild;if(o.ui.layer=null,!!a){if(!t){e.innerHTML="";return}a.classList.add("closing"),setTimeout(()=>{e.firstElementChild===a&&(e.innerHTML="")},Ls)}}var le=()=>o.ui.layer!==null;function Cs(t){t?.status===401&&oe(),t?.name!=="AppError"&&console.error(t),R(t?.name==="AppError"?t.message:"مشکلی پیش آمد. دوباره امتحان کنید.")}async function re(t){try{await t()}catch(e){Cs(e)}}function qs(t){return(t.closest(".field")?.querySelector("span")?.textContent??"این قسمت").replace(/\s*\(.*\)\s*/,"").trim()}function Ds(t){let e=t.querySelector(".ferr");if(e)return e;let a=Object.assign(document.createElement("p"),{className:"ferr"});a.setAttribute("role","alert");let s=t.querySelector('[data-a="submit"]');return s?.parentElement===t?s.before(a):t.appendChild(a),a}async function ua(t){let e=Ds(t);e.textContent="",t.querySelectorAll("[aria-invalid]").forEach(i=>i.removeAttribute("aria-invalid"));let a=[...t.querySelectorAll("[required]")].find(i=>!i.value.trim());if(a){a.setAttribute("aria-invalid","true"),a.focus(),e.textContent=`«${qs(a)}» را ${a.tagName==="SELECT"?"انتخاب":"وارد"} کنید.`;return}let s=t.querySelector('[data-a="submit"]');s?.setAttribute("aria-busy","true");try{await la[t.dataset.f](t)}catch(i){i?.name!=="AppError"&&console.error(i),i?.status===401&&t.dataset.f!=="login"&&oe(),t.isConnected&&(e.textContent=i?.name==="AppError"?i.message:"مشکلی پیش آمد. دوباره امتحان کنید.")}finally{s?.removeAttribute("aria-busy")}}function Ps(t){if(!t.dataset.confirm||t.dataset.armed)return!1;let e=t.textContent;return t.dataset.armed="1",t.textContent=t.dataset.confirm,setTimeout(()=>{t.isConnected&&(delete t.dataset.armed,t.textContent=e)},Rs),!0}function _s(t){let e=t.target.closest("[data-a]");if(!e||e.disabled||(e.tagName==="A"&&e.getAttribute("href")==="#"&&t.preventDefault(),Ps(e)))return;let a=ra[e.dataset.a];a&&re(()=>a(e.dataset,e,t))}function Ns(t){if(t.key!=="Enter"||t.isComposing)return;let e=t.target;e.matches?.("form[data-f] input:not([type=file]):not([type=checkbox])")&&(t.preventDefault(),ua(e.closest("form[data-f]")))}function ma(){A({"close-layer":(t,e,a)=>{a.target===e&&K({animate:!0})},submit:(t,e)=>ua(e.closest("form[data-f]"))}),document.addEventListener("click",_s),document.addEventListener("input",t=>{let e=oa[t.target.dataset?.i];e&&re(()=>e(t.target))}),document.addEventListener("change",t=>{let e=ca[t.target.dataset?.c];e&&re(()=>e(t.target))}),document.addEventListener("submit",t=>{t.target.closest("form[data-f]")&&t.preventDefault()}),document.addEventListener("keydown",t=>{t.key==="Escape"&&le()&&K({animate:!0}),Ns(t)})}var js=4,Hs=14,Us=8,Bs=22,zs="18:00",Gs=9,Ys=2,Vs='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>',ha=["اسپرسو بار","دمی‌های موج سوم","قنادی روزانه","صبحانه تا شام","رُست هفتگی","شیراز، بلوار بهشت"];function _t(){return`<span class="monogram" aria-hidden="true"><b>${d(z[0])}</b></span>
+    <span class="names"><b>${d(z)}</b><span class="latin">${d(ft)}</span></span>`}function Ks(){let t=(o.db.settings.instagram??"").trim();return t?/^https?:\/\//i.test(t)?t:`https://instagram.com/${t.replace(/^@/,"")}`:""}function ba(){let t=Ks();if(!t)return"";let e=t.match(/instagram\.com\/([^/?#]+)/i)?.[1];return`<a class="iglink" href="${d(t)}" target="_blank" rel="noopener" aria-label="اینستاگرام ${d(z)}">${Vs}<span dir="ltr">${d(e?"@"+e:"Instagram")}</span></a>`}var de=(t,e)=>`<div><span class="latin eyebrow">${t}</span><h2>${e}</h2><span class="deco" aria-hidden="true"><i></i></span></div>`;function Qs(){return`<svg class="rays" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#d4af6a" stroke-opacity=".45" stroke-width="1">${Array.from({length:48},(a,s)=>{let i=s%2===0;return`<line x1="200" y1="${i?4:18}" x2="200" y2="${i?44:38}" transform="rotate(${s*360/48} 200 200)"/>`}).join("")}</g><circle cx="200" cy="200" r="150" fill="none" stroke="#d4af6a" stroke-opacity=".3"/></svg>`}function Ws(){let t=`${ft} · ROASTED WEEKLY · BREWED BY THE GRAM · SHIRAZ · `.toUpperCase();return`<svg class="ring-text" viewBox="0 0 400 400" direction="ltr" aria-hidden="true">
+    <path id="ring-path" d="M200 200m-166 0a166 166 0 1 1 332 0a166 166 0 1 1-332 0" fill="none"/>
+    <text><textPath href="#ring-path">${d(t+t)}</textPath></text></svg>`}var Zs=`<svg class="steam" viewBox="0 0 120 160" aria-hidden="true">
+  <path d="M30 160C10 120 50 100 30 60S40 20 30 0"/><path d="M60 160C40 118 82 96 60 56S70 18 60 0"/><path d="M90 160C70 120 110 100 90 60S100 20 90 0"/></svg>`;function Xs(){return`<aside class="shot" aria-label="برگه عصاره‌گیری امروز">
+    <h4>برگه عصاره‌گیری <span class="live" title="زنده"></span></h4>
+    <dl><dt>دانه</dt><dd>اتیوپی گوجی</dd><dt>رُست</dt><dd class="num">${It(Date.now()-Gs*864e5)}</dd><dt>دوز / دما</dt><dd class="num">۱۸ گرم · ۹۳°</dd></dl>
+    <div class="clock"><span><b class="num" data-shot="seconds">۲۸٫۰</b> ثانیه</span><span><span class="num" data-shot="grams">۳۶</span> گرم</span></div>
+    <div class="bar"><i></i></div>
+  </aside>`}function Js(){return`<section class="hero" id="top">
+    <canvas class="dust" aria-hidden="true"></canvas>
+    <div class="wrap hero-in">
+      <div class="hero-copy">
+        <span class="latin eyebrow">Roastery · Brew bar · Kitchen</span>
+        <h1><span>طلای سیاه،</span><span class="gold-text shimmer">در فنجان شما.</span></h1>
+        <p>دانه را خودمان برشته می‌کنیم، هر شات را با ترازو و زمان‌سنج می‌گیریم و عددهایش را روی منو می‌نویسیم. آشپزخانه از صبحانه تا شام باز است.</p>
+        <div class="cta"><button class="btn primary" data-a="scroll" data-to="s-menu">دیدن منو و سفارش</button><button class="btn ghost" data-a="scroll" data-to="s-book">رزرو میز</button></div>
+      </div>
+      <div class="stage">${Qs()}${Ws()}<div class="cup">${q(o.db.items[Ys]??o.db.items[0])}</div>${Zs}${Xs()}</div>
+    </div>
+  </section>
+  <div class="marquee" aria-hidden="true"><div class="track">${[...ha,...ha].map(t=>`<span>${t}</span>`).join("")}</div></div>`}function ti(t,e){return`<span class="step"><button data-a="qty" data-id="${t}" data-d="-1" aria-label="کم کردن">−</button><b class="num">${f(e)}</b><button data-a="qty" data-id="${t}" data-d="1" aria-label="اضافه کردن">+</button></span>`}function ei(t){if(!t.avail)return'<span class="pill bad">تمام شد</span>';let e=o.cart.lines.find(a=>a.id===t.id);return e?ti(t.id,e.qty):`<button class="btn sm" data-a="add" data-id="${t.id}">افزودن</button>`}function ai(t){return`<article class="card reveal ${t.avail?"":"off"}">
+    <div class="media">${q(t)}</div>
+    <div class="body">
+      <div><h4>${d(t.name)}</h4><span class="latin en">${d(t.en??"")}</span></div>
+      <p class="desc">${d(t.desc)}</p>
+      ${t.lab?`<span class="lab num">${d(t.lab)}</span>`:""}
+      <div class="foot"><span class="price">${x(t.price)}</span>${ei(t)}</div>
+    </div></article>`}function si(t,e){return!e||`${t.name} ${t.en??""} ${t.desc}`.toLowerCase().includes(e)}function $a(){let t=[{id:"all",name:"همه"},...L];v("#cattabs").innerHTML=t.map(e=>`<button data-a="cat" data-id="${e.id}" aria-pressed="${o.ui.menuCat===e.id}">${e.name}</button>`).join("")}function pt(){let t=v("#grid");if(!t)return;let e=o.ui.menuQuery.trim().toLowerCase(),a=L.filter(s=>o.ui.menuCat==="all"||o.ui.menuCat===s.id).map(s=>({category:s,items:o.db.items.filter(i=>i.cat===s.id&&si(i,e))})).filter(s=>s.items.length);t.innerHTML=a.length?a.map(({category:s,items:i})=>`<div class="cat-h"><h3>${s.name}</h3><span class="latin muted">${s.en}</span></div><div class="grid">${i.map(ai).join("")}</div>`).join(""):`<div class="empty" style="margin-top:24px">چیزی با «${d(o.ui.menuQuery)}» در منو پیدا نشد. عبارت دیگری را امتحان کنید.</div>`}function ii(){let t=Array.from({length:Hs},(i,r)=>Date.now()+r*864e5),e=[];for(let i=Us;i<=Bs;i++)e.push(`${String(i).padStart(2,"0")}:00`,`${String(i).padStart(2,"0")}:30`);let a=Array.from({length:I.maxGuests},(i,r)=>r+1),s=(i,r,n)=>`<option value="${i}" ${n?"selected":""}>${r}</option>`;return`<form class="form" novalidate data-f="reserve">
+    <div class="frow">
+      <label class="field"><span>روز</span><select id="rs-date" name="date">${t.map(i=>s(_(i),Ot(i))).join("")}</select></label>
+      <label class="field"><span>ساعت</span><select id="rs-time" name="time">${e.map(i=>s(i,Mt(i),i===zs)).join("")}</select></label>
+      <label class="field"><span>تعداد مهمان</span><select id="rs-guests" name="guests">${a.map(i=>s(i,`${f(i)} نفر`,i===2)).join("")}</select></label>
+    </div>
+    <div class="frow">
+      <label class="field"><span>نام</span><input id="rs-name" name="name" required autocomplete="name"></label>
+      <label class="field"><span>شماره موبایل</span><input id="rs-phone" name="phone" required inputmode="tel" placeholder="۰۹…" autocomplete="tel"></label>
+    </div>
+    <label class="field"><span>توضیح (اختیاری)</span><input id="rs-note" name="note" placeholder="مثلاً میز کنار پنجره یا مناسبت خاص"></label>
+    <button class="btn primary" type="button" data-a="submit">ثبت درخواست رزرو</button>
+    <p class="muted" style="font-size:.85rem">رزرو بعد از تأیید همکاران ما قطعی می‌شود. برای بیش از ${f(I.maxGuests)} نفر با کافه تماس بگیرید.</p>
+  </form>`}function va(){let{settings:t,items:e}=o.db,a=e.filter(s=>s.sig&&s.avail).slice(0,js);v("#app").innerHTML=`
+  <header class="top"><div class="wrap">
+    <a class="mark" href="#" data-a="scroll" data-to="top">${_t()}</a>
+    <nav class="nav" aria-label="بخش‌ها">
+      <button data-a="scroll" data-to="s-menu">منو</button><button data-a="scroll" data-to="s-story">داستان ما</button><button data-a="scroll" data-to="s-book">رزرو میز</button><button data-a="scroll" data-to="s-book">تماس</button>
+    </nav>
+    <span id="trackslot"></span>
+    <button class="btn primary cartbtn" data-a="cart-open">سفارش من <span class="n num" id="cartn">۰</span></button>
+  </div></header>
+  <main>
+    ${Js()}
+    <section class="wrap sec">
+      <div class="sec-h">${de("House signatures","انتخاب‌های ما")}</div>
+      <div class="sigs">${a.map(s=>`<button class="sig reveal" data-a="add" data-id="${s.id}">
+        <span class="frame">${q(s)}<span class="add-hint">افزودن به سفارش</span></span>
+        <h3>${d(s.name)}</h3><span class="price">${x(s.price)}</span></button>`).join("")}</div>
+    </section>
+
+    <section class="wrap sec" id="s-menu" style="padding-top:0">
+      <div class="sec-h">${de("The menu","منو")}<p class="muted">قیمت‌ها به تومان است. ${f(t.service)}٪ حق سرویس برای سرو در کافه و ${f(t.vat)}٪ مالیات بر ارزش افزوده روی فیش محاسبه می‌شود.</p></div>
+      <div class="tools">
+        <div class="tabs" id="cattabs" role="group" aria-label="دسته‌بندی منو"></div>
+        <input class="inp search" id="menu-search" type="search" placeholder="جست‌وجو در منو" aria-label="جست‌وجو در منو" data-i="menu-search" value="${d(o.ui.menuQuery)}">
+      </div>
+      <div id="grid"></div>
+    </section>
+
+    <section class="story sec" id="s-story"><div class="wrap">
+      <div class="sec-h">${de("Behind the bar","پشت پیشخوان")}</div>
+      <div class="cols">
+        <div class="fact reveal"><div class="big gold-text"><span data-count="21">۲۱</span> <small>روز</small></div><h3>رُستری پشت شیشه</h3><p>دستگاه برشته‌کاری ۱۵ کیلویی ما وسط سالن است. سه‌شنبه و جمعه رُست می‌کنیم و هیچ دانه‌ای بیشتر از ۲۱ روز روی بار نمی‌ماند.</p></div>
+        <div class="fact reveal"><div class="big gold-text"><span data-count="28">۲۸</span> <small>ثانیه</small></div><h3>عدد، به‌جای حدس</h3><p>دوز، خروجی، زمان و دمای هر قهوه روی منو نوشته شده. اگر شاتی خارج از بازه باشد، دور ریخته و دوباره گرفته می‌شود.</p></div>
+        <div class="fact reveal"><div class="big gold-text"><span data-count="27">۲۷</span> <small>لایه</small></div><h3>آشپزخانه و قنادی</h3><p>کروسان و کیک‌ها هر صبح در همین ساختمان پخته می‌شوند. منوی آشپزخانه کوتاه است تا هر بشقاب درست از آب دربیاید.</p></div>
+      </div>
+    </div></section>
+
+    <section class="wrap sec book" id="s-book">
+      <div class="panel reveal"><span class="latin eyebrow">Reservations</span><h2>رزرو میز</h2>${ii()}</div>
+      <div class="info panel reveal"><span class="latin eyebrow">Find us</span><h2>نشانی و ساعت کار</h2>
+        <dl><div><dt>نشانی</dt><dd>${d(t.address)}</dd></div><div><dt>تلفن</dt><dd class="num">${d(t.phone)}</dd></div><div><dt>ساعت کار</dt><dd>${d(t.hours)}</dd></div><div><dt>پارکینگ</dt><dd>خدمات پارک خودرو از ساعت ۱۸</dd></div><div><dt>اینستاگرام</dt><dd>${ba()||"—"}</dd></div></dl>
+      </div>
+    </section>
+  </main>
+  <footer class="foot-site"><div class="wrap">
+    <div class="mark">${_t()}</div>
+    <span class="muted" style="font-size:.85rem">نمونه‌کار نمایشی؛ نشانی، تلفن و داده‌ها ساختگی‌اند.</span>
+    <div class="acts">${ba()}<button class="btn" data-a="go" data-id="staff">ورود کارکنان</button></div>
+  </div></footer>`,$a(),pt(),Nt(),gt(),sa()}function ya(){A({scroll:({to:t})=>document.getElementById(t)?.scrollIntoView({behavior:"smooth",block:"start"}),cat:({id:t})=>{o.ui.menuCat=t,$a(),pt()}}),da({"menu-search":t=>{o.ui.menuQuery=t.value,pt()}}),Q({async reserve(t){await M.call("createReservation",{name:t.name.value,phone:t.phone.value,note:t.note.value,date:t.date.value,time:t.time.value,guests:Number(t.guests.value)}),t.reset(),W("درخواست رزرو ثبت شد",`<p>درخواست شما به دست همکاران ما رسید. بعد از تأیید، رزرو قطعی است و میز تا ۱۵ دقیقه بعد از ساعت رزرو نگه داشته می‌شود.</p>
+        <div class="actions" style="margin-top:14px"><button class="btn primary" data-a="close-layer">باشه</button></div>`)}})}var ni=5e3,ga=["ثبت شد","در حال آماده‌سازی","آماده تحویل","تحویل شد"],ri={queued:0,cooking:1,ready:2,served:3,paid:3};function Nt(){let t=v("#cartn");t&&(t.textContent=f(ze()))}function oi(){return o.cart.lines=o.cart.lines.filter(t=>tt(t.id)),o.cart.lines.map(t=>({item:tt(t.id),qty:t.qty}))}function ci({item:t,qty:e}){return`<div class="line">${q(t,"thumb")}
+    <div class="t"><b>${d(t.name)}</b><span class="muted">${x(t.price*e)}</span></div>
+    <span class="step"><button data-a="qty" data-id="${t.id}" data-d="-1" aria-label="کم کردن">−</button><b class="num">${f(e)}</b><button data-a="qty" data-id="${t.id}" data-d="1" aria-label="اضافه کردن">+</button></span></div>`}function li(t){return`<div class="sums"><span>جمع آیتم‌ها</span><span>${x(t.sub)}</span>
+    ${t.service?`<span>حق سرویس ${f(t.serviceRate)}٪</span><span>${x(t.service)}</span>`:""}
+    <span>مالیات ${f(t.vatRate)}٪</span><span>${x(t.vat)}</span>
+    <span class="tot">قابل پرداخت</span><span class="tot">${x(t.total)}</span></div>`}function xa(){let t=oi();if(!t.length)return'<div class="empty">هنوز چیزی انتخاب نکرده‌اید. از منو، هر آیتمی را که می‌خواهید «افزودن» بزنید.</div>';let{cart:e,db:a}=o,s=e.type==="dinein",i=X({type:e.type,discount:0,lines:t.map(({item:n,qty:c})=>({price:n.price,qty:c}))},a.settings),r=a.tables.map(n=>`<option value="${n.id}" ${e.tableId===n.id?"selected":""}>${d(n.zone)} · میز ${d(n.name)}</option>`).join("");return`<div class="form">${t.map(ci).join("")}</div>
+    <form class="form" novalidate data-f="checkout">
+      <div class="seg" role="group" aria-label="نوع سفارش">
+        <button type="button" data-a="cart-type" data-id="dinein" aria-pressed="${s}">سرو در کافه</button>
+        <button type="button" data-a="cart-type" data-id="takeaway" aria-pressed="${!s}">بیرون‌بر</button>
+      </div>
+      ${s?`<label class="field"><span>شماره میز (روی میز نوشته شده)</span><select id="co-table" name="tableId" required data-c="cart-table"><option value="">انتخاب میز</option>${r}</select></label>`:""}
+      <div class="frow">
+        <label class="field"><span>نام</span><input id="co-name" name="name" required autocomplete="name"></label>
+        <label class="field"><span>موبایل</span><input id="co-phone" name="phone" inputmode="tel" ${s?"":"required"} autocomplete="tel"></label>
+      </div>
+      <label class="field"><span>توضیح برای باریستا یا آشپز (اختیاری)</span><input id="co-note" name="note" placeholder="مثلاً بدون شکر"></label>
+      ${li(i)}
+      <button class="btn primary block" type="button" data-a="submit">ثبت سفارش</button>
+      <p class="muted" style="font-size:.82rem">پرداخت هنگام تحویل یا سر میز انجام می‌شود.</p>
+    </form>`}function pe(){let t=v("#layer .drawer .scroll");if(o.ui.layer==="cart"&&t){t.innerHTML=xa();return}ce(`<div class="scrim" data-a="close-layer"><aside class="drawer" role="dialog" aria-modal="true" aria-label="سفارش من">
+    <header><h3>سفارش من</h3><button class="x" data-a="close-layer" aria-label="بستن">×</button></header>
+    <div class="scroll">${xa()}</div></aside></div>`,"cart")}function wa(t,e){let{cart:a}=o,s=a.lines.find(i=>i.id===t);s?s.qty+=e:e>0&&a.lines.push({id:t,qty:1}),a.lines=a.lines.filter(i=>i.qty>0),vt(),pt(),Nt(),o.ui.layer==="cart"&&pe()}async function di(t){let{cart:e}=o,a=await M.call("createCustomerOrder",{type:e.type,tableId:e.type==="dinein"?t.tableId.value:null,name:t.name.value,phone:t.phone.value,note:t.note.value,lines:e.lines.map(s=>({itemId:s.id,qty:s.qty}))});ee(a),e.lines=[],vt(),pt(),Nt(),await Sa()}async function fe(){if(!o.myOrder)return null;try{o.tracked=await M.call("trackOrder",o.myOrder)}catch(t){if(t.status!==404)throw t;o.tracked=null,ee(null)}return o.tracked}function gt(){let t=v("#trackslot");if(!t)return;let e=o.tracked;t.innerHTML=e?.status==="open"?`<button class="btn sm" data-a="track">پیگیری سفارش ${C(e.code)}</button>`:""}function ka(t){if(t.status==="cancelled")return'<div class="empty">این سفارش لغو شده است. برای سفارش دوباره از منو انتخاب کنید.</div>';let e=ri[t.stage]??0,a=t.type==="dinein"?`میز ${d(t.tableName)}`:"پیشخوان بیرون‌بر",s=i=>[i<=e?"on":"",i===e&&t.status==="open"?"now":""].join(" ");return`<p>سفارش شما ثبت شد و به ${a} می‌رسد. این صفحه با تغییر وضعیت در آشپزخانه خودش به‌روز می‌شود.</p>
+    <div class="steps" style="--progress:${e/(ga.length-1)}">${ga.map((i,r)=>`<div class="${s(r)}">${i}</div>`).join("")}</div>
+    <div class="form">${t.lines.map(i=>`<div class="line"><div class="t"><b>${f(i.qty)} × ${d(i.name)}</b></div>${at(i.state)}</div>`).join("")}</div>
+    <div class="sums" style="margin-top:14px"><span class="tot">قابل پرداخت</span><span class="tot">${x(t.sums.total)}</span></div>`}async function Sa(){let t=await fe();if(gt(),!t)return K();W(`سفارش ${C(t.code)}`,`<div id="track-body">${ka(t)}</div>`,{kind:"track"})}async function pi(){if(o.ui.view!=="site"||!o.myOrder||document.hidden)return;let t=await fe().catch(()=>null);gt();let e=v("#track-body");t&&o.ui.layer==="track"&&e&&(e.innerHTML=ka(t))}async function Ta(){await fe().catch(()=>null),gt()}function Ea(){A({add:({id:t},e)=>{ia(e),wa(t,1)},qty:({id:t,d:e})=>{wa(t,Number(e)),Pt(v(".cartbtn"))},"cart-open":()=>pe(),"cart-type":({id:t})=>{o.cart.type=t,vt(),pe()},track:()=>Sa()}),dt({"cart-table":t=>{o.cart.tableId=t.value,vt()}}),Q({checkout:di}),setInterval(pi,ni)}var fi=10,ui=[{state:"queued",title:"جدید",action:"شروع آماده‌سازی"},{state:"cooking",title:"در حال آماده‌سازی",action:"آماده شد"},{state:"ready",title:"آماده تحویل",action:"تحویل شد"}],mi=[["all","همه"],["bar","بار"],["kitchen","آشپزخانه"]],hi=t=>o.ui.kdsStation==="all"||t.station===o.ui.kdsStation;function bi(t){return G().map(e=>({order:e,lines:e.lines.filter(a=>a.state===t&&hi(a))})).filter(e=>e.lines.length).sort((e,a)=>e.lines[0].sentAt-a.lines[0].sentAt)}function $i({order:t,lines:e},a,s){let i=Math.max(0,Math.floor((s-Math.min(...e.map(c=>c.sentAt??s)))/6e4)),r=a.state!=="ready"&&i>=fi,n=e.map(c=>`<li><span class="num">${f(c.qty)}×</span><span>${d(c.name)}${c.note?` <i>(${d(c.note)})</i>`:""}</span></li>`).join("");return`<article class="kt ${r?"late":""}">
+    <div class="hd"><b>${ot(t)} · <span class="num">${C(t.code)}</span></b><span class="pill ${r?"bad":""} num">${f(i)} دقیقه</span></div>
+    <ul>${n}</ul>
+    <button class="btn sm ${a.state==="queued"?"primary":""}" data-a="kds-advance" data-id="${t.id}" data-from="${a.state}">${a.action}</button>
+  </article>`}function vi(t,e){let a=bi(t.state);return`<section class="kcol"><h3>${t.title}<span class="pill num">${f(a.length)}</span></h3>
+    ${a.length?a.map(s=>$i(s,t,e)).join(""):'<div class="empty">موردی نیست</div>'}</section>`}function Aa(){let t=Date.now();return`<div class="h-row"><h2>آشپزخانه و بار</h2><div class="seg" role="group" aria-label="ایستگاه">${mi.map(([a,s])=>`<button data-a="kds-station" data-id="${a}" aria-pressed="${o.ui.kdsStation===a}">${s}</button>`).join("")}</div></div>
+    <div class="kds">${ui.map(a=>vi(a,t)).join("")}</div>`}function Oa(){A({"kds-station":({id:t})=>{o.ui.kdsStation=t,S()},"kds-advance":({id:t,from:e})=>O("advanceLines",{id:t,from:e,station:o.ui.kdsStation})})}var yi=(()=>{try{return window.self===window.top}catch{return!1}})(),B=(t,e,a="")=>`<div class="r ${a}"><span>${t}</span><span>${e}</span></div>`;function Ia(t,{printing:e=!1}={}){let a=V(t),s=t.status==="paid",i=t.paidAt??Date.now(),r=t.lines.map(n=>`<tr><td>${d(n.name)}</td><td>${f(n.qty)}</td><td>${f(n.price)}</td><td>${f(n.price*n.qty)}</td></tr>`).join("");return`<div class="receipt ${e?"printing":""}">
+    <div class="c"><h4>${d(z)}</h4><span class="latin" style="font-size:.56rem">${d(ft)}</span><br>${d(o.db.settings.address)}<br>تلفن ${d(o.db.settings.phone)}</div><hr>
+    ${B(`${s?"فیش":"پیش‌فیش"} شماره`,`<b>${C(t.code)}</b>`)}
+    ${B("تاریخ",`${je(i)} · ${j(i)}`)}
+    ${B("محل سرو",ot(t))}<hr>
+    <table><thead><tr><th>شرح</th><th>تعداد</th><th>فی</th><th>جمع</th></tr></thead><tbody>${r}</tbody></table><hr>
+    ${B("جمع",f(a.sub))}
+    ${a.disc?B(`تخفیف ${f(t.discount)}٪`,`−${f(a.disc)}`):""}
+    ${a.service?B(`حق سرویس ${f(a.serviceRate)}٪`,f(a.service)):""}
+    ${B(`مالیات بر ارزش افزوده ${f(a.vatRate)}٪`,f(a.vat))}<hr>
+    ${B("قابل پرداخت (تومان)",f(a.total),"big")}
+    ${s?B("روش پرداخت",ta[t.method]):""}<hr>
+    <div class="c">${s?"از حضور شما سپاسگزاریم.":"این برگه رسید پرداخت نیست."}</div></div>`}function ue(t){let e=yi?`<button class="btn primary" data-a="print" data-id="${t.id}">چاپ فیش</button>`:"";W(t.status==="paid"?"فیش مشتری":"پیش‌فیش",`${Ia(t,{printing:!0})}<div class="actions center">${e}<button class="btn" data-a="close-layer">بستن</button></div>`)}function Ma(){A({receipt:({id:t})=>ue(et(t)),print:({id:t})=>{v("#print").innerHTML=Ia(et(t)),window.print()}})}function gi(t){let e=Lt(t),a=Y(t.id),s=a?`<span class="num amount">${x(V(a).total)}</span><span class="s">از ${j(a.createdAt)}</span>`:"";return`<button class="tbl ${e==="free"?"":e}" data-a="pos-table" data-id="${t.id}">
+    <b>${d(t.name)}</b><span class="s">${f(t.seats)} نفره · ${Dt[e][0]}</span>${s}</button>`}function xi(t){return`<button class="tbl busy" data-a="pos-open" data-id="${t.id}">
+    <b class="num">${C(t.code)}</b>
+    <span class="s">${d(t.customer?.name||"بدون نام")} · ${ea(rt(t))}</span>
+    <span class="num amount">${x(V(t).total)}</span>
+    <span class="s">${t.source==="site"?"از سایت · ":""}${j(t.createdAt)}</span></button>`}function wi(){let t=[...new Set(o.db.tables.map(s=>s.zone))],e=G().filter(s=>s.type==="takeaway");return`<div class="h-row"><h2>سالن و میزها</h2><div class="legend">${[["ok","آزاد"],["bad","مشغول"],["warn","منتظر تسویه"],["info","رزرو امروز"]].map(([s,i])=>`<span><i style="background:var(--${s})"></i>${i}</span>`).join("")}</div></div>
+    <div>${t.map(s=>`<div class="zone"><h3>${d(s)}</h3><div class="floor">${o.db.tables.filter(i=>i.zone===s).map(gi).join("")}</div></div>`).join("")}</div>
+    <div class="h-row" style="margin-top:8px"><h2>بیرون‌بر</h2><button class="btn primary" data-a="pos-takeaway">سفارش بیرون‌بر جدید</button></div>
+    ${e.length?`<div class="floor">${e.map(xi).join("")}</div>`:'<div class="empty">سفارش بیرون‌بر بازی وجود ندارد. سفارش‌های ثبت‌شده از سایت هم همین‌جا دیده می‌شوند.</div>'}`}function jt(){let t=o.ui.pos.orderId?et(o.ui.pos.orderId):null;return t?.status==="open"?t:(o.ui.pos.orderId=null,null)}function ki(){let t=o.db.items.filter(e=>e.cat===o.ui.posCat);return`<div>
+    <div class="tabs">${L.map(e=>`<button data-a="pos-cat" data-id="${e.id}" aria-pressed="${o.ui.posCat===e.id}">${e.name}</button>`).join("")}</div>
+    <div class="picks">${t.map(e=>`<button class="pick" data-a="pos-add" data-id="${e.id}" ${e.avail?"":"disabled"}>${q(e,"thumb")}<span><b>${d(e.name)}</b><small class="num">${e.avail?f(e.price):"تمام شد"}</small></span></button>`).join("")}</div>
+  </div>`}function Si(t){let e=t.state==="draft",a=!e&&t.note?` · <span class="line-note">${d(t.note)}</span>`:"",s=e?`<span class="step"><button data-a="pos-qty" data-id="${t.id}" data-d="-1" aria-label="کم کردن">−</button><b class="num">${f(t.qty)}</b><button data-a="pos-qty" data-id="${t.id}" data-d="1" aria-label="اضافه کردن">+</button></span>
+       <input class="inp note" id="note-${t.id}" data-c="pos-note" data-id="${t.id}" value="${d(t.note)}" placeholder="یادداشت برای آشپزخانه" aria-label="یادداشت">`:`<span style="text-align:end"><span class="num">×${f(t.qty)}</span> ${at(t.state)}</span>`;return`<div class="ti"><div><b>${d(t.name)}</b><br><span class="muted">${x(t.price*t.qty)}</span>${a}</div>${s}</div>`}function Ti(t){let e=V(t);return`<div class="sums"><span>جمع</span><span>${x(e.sub)}</span>
+    ${e.disc?`<span>تخفیف ${f(t.discount)}٪</span><span>− ${x(e.disc)}</span>`:""}
+    ${e.service?`<span>حق سرویس ${f(e.serviceRate)}٪</span><span>${x(e.service)}</span>`:""}
+    <span>مالیات ${f(e.vatRate)}٪</span><span>${x(e.vat)}</span>
+    <span class="tot">قابل پرداخت</span><span class="tot">${x(e.total)}</span></div>`}function Ei(t,e){let a=t.lines.filter(n=>n.state==="draft").length,s=o.db.tables.filter(n=>!Y(n.id)),i=wt.map(n=>`<option value="${n}" ${t.discount===n?"selected":""}>${n?f(n)+"٪":"بدون تخفیف"}</option>`).join(""),r=e?`<label class="field"><span>انتقال به میز</span><select id="pos-move" data-c="pos-move"><option value="">—</option>${s.map(n=>`<option value="${n.id}">${d(n.zone)} · ${d(n.name)}</option>`).join("")}</select></label>`:"";return`<div class="tl">${t.lines.map(Si).join("")}</div>
+    <button class="btn primary block" data-a="pos-send" ${a?"":"disabled"}>ارسال ${a?f(a)+" قلم":""} به آشپزخانه و بار</button>
+    <div class="frow"><label class="field"><span>تخفیف</span><select id="pos-disc" data-c="pos-discount">${i}</select></label>${r}</div>
+    ${Ti(t)}
+    <button class="btn block" data-a="receipt" data-id="${t.id}">پیش‌فیش</button>
+    <div class="pay">
+      <button class="btn primary" data-a="pos-pay" data-id="card" ${a?"disabled":""}>تسویه با کارت‌خوان</button>
+      <button class="btn primary" data-a="pos-pay" data-id="cash" ${a?"disabled":""}>تسویه نقدی</button>
+    </div>
+    ${a?'<p class="muted" style="font-size:.82rem">برای تسویه، اول اقلام جدید را ارسال یا حذف کنید.</p>':""}
+    <button class="btn danger sm" data-a="pos-cancel" data-confirm="لغو سفارش؟ دوباره بزنید">لغو سفارش</button>`}function Ai(){let t=jt(),e=o.ui.pos.tableId?Rt(o.ui.pos.tableId):null,a=e?`میز ${d(e.name)} <small>${d(e.zone)}</small>`:`بیرون‌بر${t?` <small class="num">${C(t.code)}</small>`:""}`,s=t?.customer?.name?`<span class="muted">${d(t.customer.name)} ${d(t.customer.phone??"")}</span>`:"";return`<div class="h-row"><button class="btn" data-a="pos-back">→ بازگشت به سالن</button></div>
+    <div class="pos">${ki()}
+      <aside class="ticket">
+        <div class="h-row tight"><h3>${a}</h3>${t?at(rt(t)):'<span class="pill">سفارش جدید</span>'}</div>
+        ${s}
+        ${t?Ei(t,e):'<div class="empty">از فهرست کنار، آیتم‌ها را اضافه کنید.</div>'}
+      </aside></div>`}var Fa=()=>o.ui.pos?Ai():wi(),me=(t,e)=>{o.ui.pos={tableId:t,orderId:e},S()},he=()=>{o.ui.pos=null,S()};async function Oi(t){let{pos:e}=o.ui;if(jt())return O("addLine",{id:e.orderId,itemId:t});let{orderId:a}=await F("createOrder",{tableId:e.tableId,itemId:t});e.orderId=a,S()}async function Ii(t,e){let a=jt(),s=a.lines.find(i=>i.id===t);await O("updateLine",{id:a.id,lineId:t,qty:s.qty+e})}function Ra(){A({"pos-table":({id:t})=>me(t,Y(t)?.id??null),"pos-takeaway":()=>me(null,null),"pos-open":({id:t})=>me(et(t).tableId,t),"pos-back":he,"pos-cat":({id:t})=>{o.ui.posCat=t,S()},"pos-add":({id:t})=>Oi(t),"pos-qty":({id:t,d:e})=>Ii(t,Number(e)),"pos-send":async()=>{await O("sendOrder",{id:o.ui.pos.orderId}),R("به آشپزخانه و بار ارسال شد")},"pos-pay":async({id:t})=>{let e=o.ui.pos.orderId;await F("payOrder",{id:e,method:t}),he(),ue(et(e))},"pos-cancel":async()=>{let t=jt();await F("cancelOrder",{id:t.id}),he(),R(`سفارش ${C(t.code)} لغو شد`)}}),dt({"pos-note":t=>F("updateLine",{id:o.ui.pos.orderId,lineId:t.dataset.id,note:t.value}),"pos-discount":t=>O("updateOrder",{id:o.ui.pos.orderId,discount:Number(t.value)}),"pos-move":async t=>{t.value&&(await F("updateOrder",{id:o.ui.pos.orderId,tableId:t.value}),o.ui.pos.tableId=t.value,S(),R(`سفارش به میز ${Rt(t.value).name} منتقل شد`))}})}var La=[["pos","سفارش‌گیری",()=>Fa()],["kds","آشپزخانه و بار",()=>Aa()],["admin","مدیریت",()=>qa()]];function Mi(){return`<div class="smain"><form class="login form" novalidate data-f="login">
+    <div><span class="latin eyebrow">Staff only</span><h2>ورود کارکنان</h2><p class="muted">سفارش‌گیری، آشپزخانه و مدیریت</p></div>
+    <label class="field"><span>رمز ورود</span><input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="off" required></label>
+    ${o.db.pinHint?`<p class="note-box">رمز نمونه: <b class="num">${d(Zt(o.db.pinHint))}</b></p>`:""}
+    <button class="btn primary" type="button" data-a="submit">ورود</button>
+    <button class="btn ghost" type="button" data-a="go" data-id="site">بازگشت به سایت</button>
+  </form></div>`}function Fi(){let t=G().reduce((s,i)=>s+i.lines.filter(r=>r.state==="queued").length,0),e=t?` <span class="pill warn num">${f(t)}</span>`:"",a=M.mode==="demo"?'<span class="pill warn mode-tag" title="داده‌ها فقط در همین مرورگر ذخیره می‌شوند">نسخه نمایشی</span>':'<span class="pill ok mode-tag" title="داده‌ها روی سرور ذخیره می‌شوند">متصل به سرور</span>';return`<header class="sbar"><div class="in">
+    <div class="mark">${_t()}</div>
+    <div class="stabs" role="group" aria-label="بخش‌های پنل">${La.map(([s,i])=>`<button data-a="staff-tab" data-id="${s}" aria-pressed="${o.ui.staffTab===s}">${i}${s==="kds"?e:""}</button>`).join("")}</div>
+    <span class="num clock">${j(Date.now())}</span>${a}
+    <button class="btn sm" data-a="go" data-id="site">سایت</button><button class="btn sm" data-a="logout">خروج</button>
+  </div></header>`}function S({animate:t=!1}={}){let e=v("#app");if(!o.ui.authed){e.innerHTML=Mi();return}let[,,a]=La.find(([s])=>s===o.ui.staffTab);e.innerHTML=`${Fi()}<div class="smain ${t?"enter":""}">${a()}</div>`}async function O(t,e){let a=await F(t,e);return S(),a}function Ca({onLogin:t,onLogout:e}){A({"staff-tab":({id:a})=>{a==="pos"&&o.ui.staffTab==="pos"&&(o.ui.pos=null),o.ui.staffTab=a,S({animate:!0})},logout:async()=>{await M.call("logout"),e()}}),Q({async login(a){await M.call("login",{pin:$t(a.pin.value.trim())}),await t()}})}var Ri=[["dash","داشبورد"],["orders","سفارش‌ها"],["menu","منو"],["tables","میزها"],["res","رزروها"],["set","تنظیمات"]],Li=[["open","باز"],["paid","تسویه‌شده"],["cancelled","لغوشده"],["all","همه"]],Ci=60,qi=6,be=7,Di=8,Pi=16,_i={width:640,height:480,quality:.8},Ht=(t,e=a=>a.sums.total)=>t.reduce((a,s)=>a+e(s),0),Ni=t=>(t/1e6).toLocaleString("fa-IR",{maximumFractionDigits:1});function Da(t,{labelEvery:e}){let a=Math.max(1,...t.map(n=>n.value)),s=t.findIndex(n=>n.value===a),i=82;return`<div class="bars">${t.map((n,c)=>{let l=n.value&&(e||c===s);return`<div class="bar" title="${n.label}: ${f(Math.round(n.value))} تومان">${l?`<span class="v num">${Ni(n.value)}</span>`:""}<i style="height:${(n.value/a*i).toFixed(1)}%"></i></div>`}).join("")}</div><div class="xl">${t.map(n=>`<span class="num">${n.label}</span>`).join("")}</div>`}function $e(t,e,a){return`<div class="r"><span>${t}</span><b>${e}</b><u style="width:${(a*100).toFixed(0)}%"></u></div>`}function ji(){let t=St(),e=o.db.orders.filter(h=>h.status==="paid"),a=e.filter(h=>h.paidAt>=t),s=Ht(a),i=Ht(a.filter(h=>h.method==="card")),r=o.db.tables.filter(h=>Y(h.id)).length,n=Array.from({length:be},(h,b)=>{let g=t-(be-1-b)*864e5;return{label:He(g),value:Ht(e.filter(k=>k.paidAt>=g&&k.paidAt<g+864e5))}}),c=Array.from({length:Pi},(h,b)=>{let g=Di+b;return{label:f(g),value:Ht(a.filter(k=>new Date(k.paidAt).getHours()===g))}}),l={};e.filter(h=>h.paidAt>=t-(be-1)*864e5).forEach(h=>h.lines.forEach(b=>{l[b.name]=(l[b.name]??0)+b.qty}));let p=Object.entries(l).sort((h,b)=>b[1]-h[1]).slice(0,qi),u=p[0]?.[1]??1,m=(h,b)=>`<div class="kpi"><span>${h}</span><b>${b}</b></div>`;return`<p class="note-box">سفارش‌های هفت روز اخیر داده نمونه‌اند تا داشبورد خالی نباشد. از «تنظیمات» می‌توانید همه را پاک کنید.</p>
+  <div class="kpis">
+    ${m("فروش امروز",x(s))}
+    ${m("فیش‌های تسویه‌شده امروز",`<span class="num">${f(a.length)}</span>`)}
+    ${m("میانگین هر فیش",x(a.length?s/a.length:0))}
+    ${m("میزهای مشغول",`<span class="num">${f(r)} <small>از ${f(o.db.tables.length)}</small></span>`)}
+    ${m("سفارش‌های باز",`<span class="num">${f(G().length)}</span>`)}
+  </div>
+  <div class="panels">
+    <div class="panel"><h3>فروش هفت روز اخیر</h3><span class="muted">میلیون تومان</span>${Da(n,{labelEvery:!0})}</div>
+    <div class="panel"><h3>فروش ساعتی امروز</h3><span class="muted">میلیون تومان، بر اساس ساعت تسویه</span>${Da(c,{labelEvery:!1})}</div>
+    <div class="panel"><h3>پرفروش‌های هفته</h3><span class="muted">تعداد فروش در هفت روز اخیر</span>
+      <div class="rank">${p.map(([h,b])=>$e(d(h),`<span class="num">${f(b)}</span>`,b/u)).join("")||'<div class="empty">هنوز فروشی ثبت نشده</div>'}</div></div>
+    <div class="panel"><h3>روش پرداخت امروز</h3><span class="muted">سهم از فروش</span>
+      <div class="rank">${$e("کارت‌خوان",x(i),s?i/s:0)}${$e("نقدی",x(s-i),s?(s-i)/s:0)}</div></div>
+  </div>`}function Hi(){let t=o.ui.orderFilter,e=o.db.orders.filter(n=>t==="all"||n.status===t).sort((n,c)=>(c.paidAt??c.createdAt)-(n.paidAt??n.createdAt)),a=e.slice(0,Ci),s=Li.map(([n,c])=>`<button data-a="order-filter" data-id="${n}" aria-pressed="${t===n}">${c}</button>`).join(""),i=a.map(n=>`<tr>
+    <td class="num">${C(n.code)}</td><td class="num">${It(n.createdAt)} · ${j(n.createdAt)}</td><td>${ot(n)}</td>
+    <td class="w">${n.lines.map(c=>`${d(c.name)}${c.qty>1?" ×"+f(c.qty):""}`).join("، ")}</td>
+    <td>${x(V(n).total)}</td><td>${at(rt(n))}</td>
+    <td><button class="btn sm" data-a="receipt" data-id="${n.id}">${n.status==="paid"?"فیش":"پیش‌فیش"}</button></td></tr>`).join(""),r=e.length>a.length?`<p class="muted" style="margin-top:8px">${f(a.length)} سفارش آخر از ${f(e.length)} سفارش نمایش داده شده است.</p>`:"";return`<div class="h-row"><h2>سفارش‌ها</h2><div class="seg" role="group" aria-label="فیلتر وضعیت">${s}</div></div>
+    ${a.length?`<div class="tw"><table class="t"><thead><tr><th>شماره</th><th>زمان</th><th>محل</th><th>اقلام</th><th>مبلغ</th><th>وضعیت</th><th></th></tr></thead><tbody>${i}</tbody></table></div>${r}`:'<div class="empty">سفارشی با این وضعیت وجود ندارد.</div>'}`}function Ui(t,e){return`<tr><td>${q(t,"thumb")}</td>
+    <td><b>${d(t.name)}</b>${t.sig?' <span class="pill">ویژه</span>':""}<br><span class="latin muted" style="font-size:.56rem">${d(t.en??"")}</span></td>
+    <td>${e.name}</td><td>${x(t.price)}</td>
+    <td><button class="btn sm" data-a="item-toggle" data-id="${t.id}">${yt(t.avail?["موجود","ok"]:["تمام شد","bad"])}</button></td>
+    <td><button class="btn sm" data-a="item-edit" data-id="${t.id}">ویرایش</button> <button class="btn sm danger" data-a="item-delete" data-id="${t.id}" data-confirm="حذف شود؟">حذف</button></td></tr>`}function Bi(){let t=L.map(e=>o.db.items.filter(a=>a.cat===e.id).map(a=>Ui(a,e)).join("")).join("");return`<div class="h-row"><h2>منو <small class="num">${f(o.db.items.length)} آیتم</small></h2><button class="btn primary" data-a="item-edit" data-id="new">افزودن آیتم</button></div>
+    <div class="tw"><table class="t"><thead><tr><th></th><th>نام</th><th>دسته</th><th>قیمت</th><th>موجودی</th><th></th></tr></thead><tbody>${t}</tbody></table></div>`}var Pa='<span class="pic"></span>';function zi(t){let e=t==="new",a=e?{cat:o.ui.posCat,name:"",en:"",price:"",desc:"",lab:"",avail:!0}:tt(t);o.ui.draftImage=a.img??null;let s=a.img&&!a.img.startsWith("data:")?a.img:"",i=L.map(r=>`<option value="${r.id}" ${r.id===a.cat?"selected":""}>${r.name}</option>`).join("");W(e?"آیتم جدید":"ویرایش آیتم",`<form class="form" novalidate data-f="item" data-id="${e?"new":a.id}">
+    <div class="frow"><label class="field"><span>نام</span><input id="it-name" name="name" required value="${d(a.name)}"></label><label class="field"><span>نام لاتین</span><input id="it-en" name="en" dir="ltr" value="${d(a.en??"")}"></label></div>
+    <div class="frow"><label class="field"><span>دسته</span><select id="it-cat" name="cat">${i}</select></label><label class="field"><span>قیمت (تومان)</span><input id="it-price" name="price" required inputmode="numeric" value="${d(a.price)}"></label></div>
+    <label class="field"><span>توضیح</span><textarea id="it-desc" name="desc">${d(a.desc)}</textarea></label>
+    <label class="field"><span>برچسب مشخصات عصاره‌گیری (اختیاری)</span><input id="it-lab" name="lab" value="${d(a.lab??"")}" placeholder="۱۸ گرم ← ۳۶ گرم · ۲۸ ثانیه"></label>
+    <div class="field"><span>عکس</span><div class="imgrow"><span id="it-prev">${e?Pa:q(a)}</span>
+      <div class="form">
+        <input class="inp" id="it-file" type="file" accept="image/*" data-c="item-file" aria-label="بارگذاری عکس">
+        <input class="inp" id="it-url" name="url" dir="ltr" placeholder="یا نشانی اینترنتی عکس (https://…)" value="${d(s)}" aria-label="نشانی عکس">
+        <button type="button" class="btn sm" data-a="item-clear-image">حذف عکس و استفاده از تصویر پیش‌فرض</button>
+      </div></div></div>
+    <div class="frow"><label class="check"><input id="it-avail" type="checkbox" name="avail" ${a.avail?"checked":""}> موجود است</label><label class="check"><input id="it-sig" type="checkbox" name="sig" ${a.sig?"checked":""}> نمایش در «انتخاب‌های ما»</label></div>
+    <button class="btn primary" type="button" data-a="submit">ذخیره</button></form>`,{wide:!0})}function Gi(t){return new Promise((e,a)=>{let s=new FileReader;s.onerror=a,s.onload=()=>{let i=new Image;i.onerror=a,i.onload=()=>{let{width:r,height:n,quality:c}=_i,l=Object.assign(document.createElement("canvas"),{width:r,height:n}),p=Math.max(r/i.width,n/i.height),u=i.width*p,m=i.height*p;l.getContext("2d").drawImage(i,(r-u)/2,(n-m)/2,u,m),e(l.toDataURL("image/jpeg",c))},i.src=s.result},s.readAsDataURL(t)})}async function Yi(t){let e=parseInt($t(t.price.value).replace(/[^\d]/g,""),10)||0,a={name:t.name.value,en:t.en.value,cat:t.cat.value,price:e,desc:t.desc.value,lab:t.lab.value,avail:t.avail.checked,sig:t.sig.checked,img:t.url.value.trim()||o.ui.draftImage||null},s=t.dataset.id==="new";await F(s?"createItem":"updateItem",s?a:{id:t.dataset.id,...a}),K(),S(),R("ذخیره شد")}function Vi(){let t=[...new Set(o.db.tables.map(a=>a.zone))],e=o.db.tables.map(a=>{let s=!!Y(a.id);return`<tr><td><b>${d(a.name)}</b></td><td>${d(a.zone)}</td><td class="num">${f(a.seats)} نفر</td><td>${yt(Dt[Lt(a)])}</td>
+      <td><button class="btn sm danger" data-a="table-delete" data-id="${a.id}" data-confirm="حذف شود؟" ${s?'disabled title="میز سفارش باز دارد"':""}>حذف</button></td></tr>`}).join("");return`<div class="h-row"><h2>میزها</h2></div>
+  <form class="form panel" novalidate data-f="table" style="margin-bottom:14px"><div class="frow">
+    <label class="field"><span>نام یا شماره میز</span><input id="tb-name" name="name" required></label>
+    <label class="field"><span>بخش</span><input id="tb-zone" name="zone" required list="zones" value="سالن"><datalist id="zones">${t.map(a=>`<option value="${d(a)}">`).join("")}</datalist></label>
+    <label class="field"><span>ظرفیت</span><input id="tb-seats" name="seats" type="number" min="1" max="${I.maxTableSeats}" value="2" required></label>
+    <div class="field"><span>&nbsp;</span><button class="btn primary" type="button" data-a="submit">افزودن میز</button></div>
+  </div></form>
+  <div class="tw"><table class="t"><thead><tr><th>میز</th><th>بخش</th><th>ظرفیت</th><th>وضعیت</th><th></th></tr></thead><tbody>${e}</tbody></table></div>`}function Ki(t){let e=o.db.tables.filter(i=>i.seats>=t.guests||i.id===t.tableId).map(i=>`<option value="${i.id}" ${i.id===t.tableId?"selected":""}>${d(i.zone)} · ${d(i.name)} (${f(i.seats)})</option>`).join(""),a=t.status!=="confirmed"?`<button class="btn sm primary" data-a="reservation-status" data-id="${t.id}" data-status="confirmed">تأیید</button> `:"",s=t.status!=="cancelled"?`<button class="btn sm danger" data-a="reservation-status" data-id="${t.id}" data-status="cancelled">لغو</button>`:"";return`<tr><td>${Ot(new Date(`${t.date}T12:00`).getTime())}<br><span class="num">${Mt(t.time)}</span></td>
+    <td><b>${d(t.name)}</b><br><span class="num muted">${d(t.phone)}</span></td>
+    <td class="num">${f(t.guests)} نفر</td><td class="w">${d(t.note||"—")}</td>
+    <td><select class="inp" id="rt-${t.id}" data-c="reservation-table" data-id="${t.id}" aria-label="میز رزرو"><option value="">—</option>${e}</select></td>
+    <td>${yt(Je[t.status])}</td><td>${a}${s}</td></tr>`}function Qi(){let t=[...o.db.reservations].sort((e,a)=>(e.date+e.time).localeCompare(a.date+a.time));return`<div class="h-row"><h2>رزروها</h2></div>${t.length?`<div class="tw"><table class="t"><thead><tr><th>روز و ساعت</th><th>مهمان</th><th>تعداد</th><th>توضیح</th><th>میز</th><th>وضعیت</th><th></th></tr></thead><tbody>${t.map(Ki).join("")}</tbody></table></div>`:'<div class="empty">هنوز رزروی ثبت نشده. درخواست‌های فرم «رزرو میز» سایت این‌جا می‌آیند.</div>'}`}function Wi(){let{settings:t}=o.db,e=M.mode==="demo"?"در نسخه نمایشی، همه چیز در مرورگر همین دستگاه ذخیره می‌شود.":"داده‌ها روی سرور در فایل data/db.json ذخیره می‌شوند.";return`<div class="h-row"><h2>تنظیمات</h2></div><div class="stack">
+  <form class="form panel narrow" novalidate data-f="settings">
+    <div class="frow"><label class="field"><span>حق سرویس (٪)</span><input id="st-service" name="service" type="number" min="0" max="${I.maxRatePercent}" value="${t.service}" required></label><label class="field"><span>مالیات بر ارزش افزوده (٪)</span><input id="st-vat" name="vat" type="number" min="0" max="${I.maxRatePercent}" value="${t.vat}" required></label></div>
+    <label class="field"><span>نشانی</span><input id="st-address" name="address" value="${d(t.address)}"></label>
+    <label class="field"><span>صفحه اینستاگرام (نشانی کامل یا نام کاربری)</span><input id="st-instagram" name="instagram" dir="ltr" value="${d(t.instagram??"")}" placeholder="https://instagram.com/yourcafe"></label>
+    <div class="frow"><label class="field"><span>تلفن</span><input id="st-phone" name="phone" value="${d(t.phone)}"></label><label class="field"><span>ساعت کار</span><input id="st-hours" name="hours" value="${d(t.hours)}"></label></div>
+    <div class="actions"><button class="btn primary" type="button" data-a="submit">ذخیره تنظیمات</button></div>
+  </form>
+  <form class="form panel narrow" novalidate data-f="pin">
+    <h3>رمز ورود کارکنان</h3>
+    <label class="field"><span>رمز جدید</span><input id="st-pin" name="pin" type="password" inputmode="numeric" autocomplete="new-password" required></label>
+    <p class="muted" style="font-size:.85rem">با تغییر رمز، دستگاه‌های دیگر باید دوباره وارد شوند.</p>
+    <div class="actions"><button class="btn" type="button" data-a="submit">تغییر رمز</button></div>
+  </form>
+  <div class="panel narrow"><h3>داده‌ها</h3><p class="muted" style="margin-bottom:10px">${e} بازگردانی، منو و میزها را به حالت اول برمی‌گرداند و سفارش‌ها را با داده نمونه تازه جایگزین می‌کند.</p>
+    <div class="actions"><button class="btn danger" data-a="demo-reset" data-confirm="همه داده‌ها بازگردانی شود؟ دوباره بزنید">بازگردانی داده‌های نمونه</button><button class="btn danger" data-a="demo-clear" data-confirm="همه سفارش‌ها پاک شود؟ دوباره بزنید">پاک کردن همه سفارش‌ها و رزروها</button></div></div>
+  </div>`}var Zi={dash:ji,orders:Hi,menu:Bi,tables:Vi,res:Qi,set:Wi};function qa(){return`<div class="atabs" role="group" aria-label="بخش‌های مدیریت">${Ri.map(([e,a])=>`<button data-a="admin-tab" data-id="${e}" aria-pressed="${o.ui.adminTab===e}">${a}</button>`).join("")}</div><div>${Zi[o.ui.adminTab]()}</div>`}function _a(){A({"admin-tab":({id:t})=>{o.ui.adminTab=t,S({animate:!0})},"order-filter":({id:t})=>{o.ui.orderFilter=t,S()},"item-edit":({id:t})=>zi(t),"item-toggle":({id:t})=>O("setItemAvailability",{id:t,avail:!tt(t).avail}),"item-delete":async({id:t})=>{await O("deleteItem",{id:t}),R("آیتم حذف شد")},"item-clear-image":()=>{o.ui.draftImage=null,v("#it-url").value="",v("#it-file").value="";let t=tt(v('form[data-f="item"]').dataset.id);v("#it-prev").innerHTML=t?q({...t,img:null}):Pa},"table-delete":({id:t})=>O("deleteTable",{id:t}),"reservation-status":({id:t,status:e})=>O("updateReservation",{id:t,status:e}),"demo-reset":async()=>{o.ui.pos=null,await O("resetDemo"),R("داده‌های نمونه بازگردانی شد")},"demo-clear":async()=>{o.ui.pos=null,await O("clearOrders"),R("سفارش‌ها و رزروها پاک شد")}}),dt({"reservation-table":t=>O("updateReservation",{id:t.dataset.id,tableId:t.value||null}),"item-file":async t=>{let e=t.files[0];if(e){try{o.ui.draftImage=await Gi(e)}catch{return R("این فایل عکس قابل خواندن نیست")}v("#it-url").value="",v("#it-prev").innerHTML=`<span class="pic"><img src="${o.ui.draftImage}" alt="پیش‌نمایش عکس"></span>`}}}),Q({item:Yi,async table(t){await O("createTable",{name:t.name.value,zone:t.zone.value,seats:Number(t.seats.value)}),R("میز اضافه شد")},async settings(t){await F("updateSettings",{service:Number(t.service.value),vat:Number(t.vat.value),address:t.address.value,phone:t.phone.value,hours:t.hours.value,instagram:t.instagram.value}),R("تنظیمات ذخیره شد")},async pin(t){await F("changePin",{pin:$t(t.pin.value.trim())}),t.reset(),R("رمز تغییر کرد")}})}var Na="#staff",Xi=3e4,Ji=600,ge=null,tn=()=>document.activeElement?.matches?.("input, textarea, select")??!1;async function ja(){o.ui.view!=="staff"||!o.ui.authed||tn()||(await F("staffState"),le()||S())}function en(){ge??=M.subscribe(()=>{We()>Ji&&ja().catch(console.error)})}function Ha(){ge?.(),ge=null}async function xe(){try{await F("staffState"),o.ui.authed=!0,en()}catch(t){if(t.status!==401)throw t;Ua(),await se()}S({animate:!0})}function Ua(){o.ui.authed=!1,o.ui.pos=null,Ha()}function we(){Ua(),o.ui.view==="staff"&&S()}async function an(){Ha(),await se(),va(),await Ta()}function sn(){try{history.replaceState(null,"",o.ui.view==="staff"?Na:location.pathname+location.search)}catch{}}async function ve(t){K(),o.ui.view=t==="staff"?"staff":"site",sn(),await(o.ui.view==="staff"?xe():an()),window.scrollTo(0,0)}function ye(){try{return location.hash===Na?"staff":"site"}catch{return"site"}}function Ba(){return A({go:({id:t})=>ve(t)}),window.addEventListener("hashchange",()=>{ye()!==o.ui.view&&ve(ye())}),setInterval(()=>ja().catch(console.error),Xi),ve(ye())}async function nn(){document.documentElement.lang="fa",document.documentElement.dir="rtl",document.title=`کافه ${z}`,ma(),Ze(),ya(),Ea(),Ra(),Oa(),_a(),Ma(),Ca({onLogin:xe,onLogout:we}),pa(we),await Qe(),await Ba()}nn().catch(t=>{console.error(t),v("#app").innerHTML=`<div class="wrap" style="padding-block:80px"><div class="empty">سایت بالا نیامد: ${d(t.message??"خطای ناشناخته")}<br>صفحه را دوباره باز کنید.</div></div>`});})();
+</script>
+</body>
+</html>
